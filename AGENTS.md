@@ -18,6 +18,8 @@ This repository uses a single-context domain-documentation layout. See `docs/age
 
 When changing the repository layout, application modules, consumer-AI workflow, review gates, or release process, read `docs/architecture.md` and the relevant ADRs under `docs/adr/` first.
 
+When adding or changing an Application Module, also read `docs/application-modules.md`. Complete the module when its native-root file layout, natural-language guidance, inline capability explanations, safe validation, and categorized `[Unreleased]` entry all pass `scripts/check all`.
+
 ## Consumer configuration guidance
 
 When a user asks for help applying a module to their own configuration, complete these stages in order:

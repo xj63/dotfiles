@@ -54,7 +54,12 @@ class FishRecoveryProtocolTests(unittest.TestCase):
             subprocess.run(["git", "checkout", "-b", "main"], cwd=repository, check=True, capture_output=True)
             self._write(repository, ".gitignore", "/.local/\n*.backup\n")
             self._write(repository, "REVIEW.md", "review-policy-marker\n")
-            self._write(repository, "fish/README.md", "fish-context-marker\n")
+            self._write(
+                repository,
+                "fish/README.md",
+                "fish-context-marker\n\nFish requires Fish. Place `config.fish` at "
+                "`$XDG_CONFIG_HOME/fish/config.fish` and validate with `fish --no-execute`.\n",
+            )
             self._write(repository, "fish/config.fish", "set fish_greeting\n")
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "baseline")
@@ -108,7 +113,7 @@ class FishRecoveryProtocolTests(unittest.TestCase):
                 check=False,
             )
 
-        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertNotEqual(0, result.returncode)
         self.assertNotIn("external-private-marker", result.stdout)
 
     def test_review_context_does_not_run_a_configured_textconv_filter(self) -> None:
@@ -117,7 +122,12 @@ class FishRecoveryProtocolTests(unittest.TestCase):
             subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
             subprocess.run(["git", "checkout", "-b", "main"], cwd=repository, check=True, capture_output=True)
             self._write(repository, "REVIEW.md", "review policy\n")
-            self._write(repository, "fish/README.md", "fish module\n")
+            self._write(
+                repository,
+                "fish/README.md",
+                "fish module\n\nFish requires Fish. Place `config.fish` at "
+                "`$XDG_CONFIG_HOME/fish/config.fish` and validate with `fish --no-execute`.\n",
+            )
             self._write(repository, "fish/config.fish", "set fish_greeting\n")
             self._write(repository, ".gitattributes", "fish/config.fish diff=leaky\n")
             subprocess.run(["git", "add", "."], cwd=repository, check=True)

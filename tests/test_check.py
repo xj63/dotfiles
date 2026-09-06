@@ -258,7 +258,11 @@ class RepositoryCheckTests(unittest.TestCase):
 
     def test_full_check_accepts_portable_placeholders_and_ignored_local_state(self) -> None:
         self.write(".gitignore", "/.local/\n")
-        self.write("fish/README.md", "# Fish\n")
+        self.write(
+            "fish/README.md",
+            "# Fish\n\nFish requires Fish. Place `settings.json` at "
+            "`$XDG_CONFIG_HOME/fish/settings.json` and validate it with `fish --check`.\n",
+        )
         self.write(
             "fish/settings.json",
             "{\n"

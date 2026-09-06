@@ -20,6 +20,7 @@ class UpdateContextTests(unittest.TestCase):
         self.repository = Path(self.temp_directory.name) / "upstream"
         subprocess.run(["git", "init", "--quiet", str(self.repository)], check=True)
         self.write("CHANGELOG.md", "# Changelog\n\n## [Unreleased]\n\n### Changed\n")
+        self.write("docs/local-consumer-state.md", "# Local consumer state\n")
         self.write("fish/README.md", "# Fish\n")
         self.write("fish/config.fish", "set --global fish_greeting\n")
         self.write("wezterm/README.md", "# WezTerm\n")
@@ -140,6 +141,10 @@ class UpdateContextTests(unittest.TestCase):
             "- **repository / consumer protocol**: Clarify confirmation. Existing users need no migration.\n",
         )
         self.write("AGENTS.md", "# Agent guidance\n\nshared-protocol-marker\n")
+        self.write(
+            "docs/local-consumer-state.md",
+            "# Local consumer state\n\nlocal-state-protocol-marker\n",
+        )
         subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
         self.commit("shared protocol update")
 
@@ -148,6 +153,33 @@ class UpdateContextTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertIn("repository / consumer protocol", result.stdout)
         self.assertIn("shared-protocol-marker", result.stdout)
+        self.assertIn("local-state-protocol-marker", result.stdout)
+
+    def test_rejects_an_undocumented_shared_consumer_protocol_change(self) -> None:
+        self.write("AGENTS.md", "# Agent guidance\n\nundocumented-shared-marker\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("undocumented shared protocol")
+
+        result = self.run_context("fish")
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("repository / consumer protocol", result.stderr)
+
+    def test_fish_entry_does_not_hide_an_undocumented_shared_change(self) -> None:
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n### Changed\n\n"
+            "- **Fish / behavior**: Change greeting behavior. Existing users must review it.\n",
+        )
+        self.write("fish/config.fish", "set --global fish_greeting\n# documented Fish change\n")
+        self.write("AGENTS.md", "# Agent guidance\n\nundocumented-shared-marker\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("mixed documentation coverage")
+
+        result = self.run_context("fish")
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("repository / consumer protocol", result.stderr)
 
     def test_reports_a_module_removed_after_the_review_cursor(self) -> None:
         self.write(

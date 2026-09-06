@@ -17,6 +17,7 @@ SHARED_CONSUMER_PROTOCOL = (
     "AGENTS.md",
     "README.md",
     "docs/architecture.md",
+    "docs/local-consumer-state.md",
     "scripts/update-context",
 )
 
@@ -155,7 +156,13 @@ def main() -> int:
         "--",
         *SHARED_CONSUMER_PROTOCOL,
     ).stdout
-    relevant_shared_diff = shared_diff if application_entries or shared_entries else ""
+    if shared_diff and not shared_entries:
+        print(
+            "Shared changes require repository / consumer protocol change information "
+            "after the Review Cursor",
+            file=sys.stderr,
+        )
+        return 1
     entries = application_entries + shared_entries
     state = (
         "removed at target"
@@ -174,7 +181,7 @@ def main() -> int:
     print("\n".join(entries) if entries else "No application change information in this range.")
     print(f"\n=== {module.upper()} RELEVANT TRACKED DIFF ===")
     print(application_diff, end="")
-    print(relevant_shared_diff, end="")
+    print(shared_diff, end="")
     return 0
 
 

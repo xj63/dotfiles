@@ -41,7 +41,15 @@ def main() -> int:
         print(checked.stdout, end="")
         return checked.returncode
 
-    changed = git(root, "diff", "--name-only", "--diff-filter=ACMR", f"{arguments.base}...HEAD").splitlines()
+    changed = git(
+        root,
+        "diff",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--name-only",
+        "--diff-filter=ACMR",
+        f"{arguments.base}...HEAD",
+    ).splitlines()
     tracked = set(git(root, "ls-files").splitlines())
     modules = sorted(
         {
@@ -60,7 +68,17 @@ def main() -> int:
         print(f"\n=== MODULE CONTEXT: {module}/README.md ===")
         print(git(root, "show", f"HEAD:{module}/README.md"), end="")
     print(f"\n=== TRACKED DIFF: {arguments.base}...HEAD ===")
-    print(git(root, "diff", "--no-ext-diff", "--unified=3", f"{arguments.base}...HEAD"), end="")
+    print(
+        git(
+            root,
+            "diff",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--unified=3",
+            f"{arguments.base}...HEAD",
+        ),
+        end="",
+    )
     return 0
 
 

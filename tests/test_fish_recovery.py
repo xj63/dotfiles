@@ -111,6 +111,43 @@ class FishRecoveryProtocolTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertNotIn("external-private-marker", result.stdout)
 
+    def test_review_context_does_not_run_a_configured_textconv_filter(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory) / "repository"
+            subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
+            subprocess.run(["git", "checkout", "-b", "main"], cwd=repository, check=True, capture_output=True)
+            self._write(repository, "REVIEW.md", "review policy\n")
+            self._write(repository, "fish/README.md", "fish module\n")
+            self._write(repository, "fish/config.fish", "set fish_greeting\n")
+            self._write(repository, ".gitattributes", "fish/config.fish diff=leaky\n")
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            self._commit(repository, "baseline")
+
+            external = Path(directory) / "external-private.txt"
+            external.write_text("external-textconv-marker\n")
+            helper = Path(directory) / "textconv"
+            helper.write_text(f"#!/bin/sh\ncat '{external}'\ncat \"$1\"\n")
+            helper.chmod(0o755)
+            subprocess.run(
+                ["git", "config", "diff.leaky.textconv", str(helper)],
+                cwd=repository,
+                check=True,
+            )
+            subprocess.run(["git", "checkout", "-b", "change"], cwd=repository, check=True, capture_output=True)
+            self._write(repository, "fish/config.fish", "set fish_greeting\n# change\n")
+            subprocess.run(["git", "add", "fish/config.fish"], cwd=repository, check=True)
+            self._commit(repository, "change config")
+
+            result = subprocess.run(
+                [str(REVIEW_CONTEXT), "main", "--root", str(repository)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertNotIn("external-textconv-marker", result.stdout)
+
     @staticmethod
     def _write(root: Path, relative_path: str, content: str) -> None:
         path = root / relative_path

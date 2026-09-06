@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Classify changes and verify a prepared Semantic Version release."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+CLASSIFICATION = {
+    "breaking-protocol": "major",
+    "module-layout": "major",
+    "new-module": "minor",
+    "new-capability": "minor",
+    "dependency": "minor",
+    "behavior": "minor",
+    "documentation": "patch",
+    "non-behavioral-correction": "patch",
+}
+
+
+def section(document: str, heading: str) -> str | None:
+    lines = document.splitlines()
+    try:
+        start = lines.index(heading) + 1
+    except ValueError:
+        return None
+    end = len(lines)
+    for index in range(start, len(lines)):
+        if lines[index].startswith("## ["):
+            end = index
+            break
+    return "\n".join(lines[start:end]).strip()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    classify = subparsers.add_parser("classify")
+    classify.add_argument("change", choices=sorted(CLASSIFICATION))
+    verify = subparsers.add_parser("verify")
+    verify.add_argument("version")
+    verify.add_argument("--root", type=Path, default=Path.cwd())
+    verify.add_argument("--notes", type=Path, required=True)
+    verify.add_argument("--tag-required", action="store_true")
+    arguments = parser.parse_args()
+
+    if arguments.command == "classify":
+        print(CLASSIFICATION[arguments.change])
+        return 0
+
+    if not re.fullmatch(r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)", arguments.version):
+        print("Version must be a stable Semantic Version such as 1.2.3", file=sys.stderr)
+        return 2
+    root = arguments.root.resolve()
+    changelog = (root / "CHANGELOG.md").read_text()
+    unreleased = section(changelog, "## [Unreleased]")
+    if unreleased is None or unreleased:
+        print("CHANGELOG must retain a fresh, empty [Unreleased] section", file=sys.stderr)
+        return 1
+    release_heading = next(
+        (
+            line
+            for line in changelog.splitlines()
+            if re.fullmatch(rf"## \[{re.escape(arguments.version)}\] - \d{{4}}-\d{{2}}-\d{{2}}", line)
+        ),
+        None,
+    )
+    if release_heading is None:
+        print(f"CHANGELOG has no dated [{arguments.version}] section", file=sys.stderr)
+        return 1
+    release_body = section(changelog, release_heading)
+    notes_path = arguments.notes if arguments.notes.is_absolute() else root / arguments.notes
+    notes_lines = notes_path.read_text().splitlines()
+    notes_body = "\n".join(notes_lines[1:]).strip() if notes_lines and notes_lines[0].startswith("# ") else ""
+    if not release_body or release_body != notes_body:
+        print("GitHub Release notes are not equivalent to the CHANGELOG release section", file=sys.stderr)
+        return 1
+    if arguments.tag_required:
+        tag = subprocess.run(
+            ["git", "rev-parse", "--verify", f"v{arguments.version}^{{commit}}"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD^{commit}"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        if tag.returncode or tag.stdout.strip() != head.stdout.strip():
+            print(f"v{arguments.version} does not identify HEAD", file=sys.stderr)
+            return 1
+    print(f"Release {arguments.version} is consistent.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

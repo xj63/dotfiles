@@ -112,6 +112,16 @@ def main() -> int:
         print(f"Release notes must be {expected_notes}", file=sys.stderr)
         return 1
     if arguments.tag_required:
+        tag_type = subprocess.run(
+            ["git", "cat-file", "-t", tag_name],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if tag_type.returncode or tag_type.stdout.strip() != "tag":
+            print(f"{tag_name} must be an annotated tag", file=sys.stderr)
+            return 1
         tag = subprocess.run(
             ["git", "rev-parse", "--verify", f"{tag_name}^{{commit}}"],
             cwd=root,
@@ -142,9 +152,10 @@ def main() -> int:
         except ValueError as error:
             print(error, file=sys.stderr)
             return 1
+    unreleased_headings = re.findall(r"^## \[Unreleased\]$", changelog, re.MULTILINE)
     unreleased = section(changelog, "## [Unreleased]")
-    if unreleased is None or unreleased:
-        print("CHANGELOG must retain a fresh, empty [Unreleased] section", file=sys.stderr)
+    if len(unreleased_headings) != 1 or unreleased:
+        print("CHANGELOG must contain exactly one fresh, empty [Unreleased] section", file=sys.stderr)
         return 1
     headings = re.findall(
         rf"^## \[{re.escape(arguments.version)}\] - (\d{{4}}-\d{{2}}-\d{{2}})$",

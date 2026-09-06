@@ -17,7 +17,9 @@ On the updated clean `main`, verify the merge commit and create the matching ann
 git tag --annotate vX.Y.Z --message "vX.Y.Z"
 scripts/release-check verify X.Y.Z --notes docs/releases/X.Y.Z.md --tag-required
 git push origin vX.Y.Z
-scripts/release-check notes X.Y.Z | gh release create vX.Y.Z --title "vX.Y.Z" --notes-file - --verify-tag
+scripts/publish-release X.Y.Z
 ```
+
+`scripts/publish-release` repeats local tag verification and reads the notes from the tagged tree before invoking GitHub. If either local step fails, it does not call `gh`.
 
 Confirm the GitHub Release targets the same commit as the tag and its body matches the committed notes. A fresh consumer may record the tag as its initial Review Cursor. An existing consumer runs the selected module's update assessment from its earlier cursor; release publication never synchronizes its configuration.

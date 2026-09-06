@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Create a GitHub Release only after local tagged inputs validate."""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import subprocess
+import sys
+
+
+def run_local(command: list[str], root: Path) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(command, cwd=root, text=True, capture_output=True, check=False)
+    if result.returncode:
+        if result.stdout:
+            print(result.stdout, end="", file=sys.stderr)
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("version")
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    arguments = parser.parse_args()
+
+    root = arguments.root.resolve()
+    release_check = Path(__file__).resolve().with_name("release-check")
+    notes_path = f"docs/releases/{arguments.version}.md"
+    verify = run_local(
+        [str(release_check), "verify", arguments.version, "--root", str(root), "--notes", notes_path, "--tag-required"],
+        root,
+    )
+    if verify.returncode:
+        return verify.returncode
+
+    notes = run_local(
+        [str(release_check), "notes", arguments.version, "--root", str(root)],
+        root,
+    )
+    if notes.returncode:
+        return notes.returncode
+
+    tag_name = f"v{arguments.version}"
+    published = subprocess.run(
+        ["gh", "release", "create", tag_name, "--title", tag_name, "--notes-file", "-", "--verify-tag"],
+        cwd=root,
+        text=True,
+        input=notes.stdout,
+        check=False,
+    )
+    return published.returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

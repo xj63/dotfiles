@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE_CHECK = ROOT / "scripts" / "release-check"
+PUBLISH_RELEASE = ROOT / "scripts" / "publish-release"
 UPDATE_CONTEXT = ROOT / "scripts" / "update-context"
 
 
@@ -60,7 +61,7 @@ class ReleaseTests(unittest.TestCase):
             self._write_release_fixture(repository)
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "v1.0.0"], cwd=repository, check=True)
+            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
             (repository / "later.txt").write_text("later\n")
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "later")
@@ -91,7 +92,7 @@ class ReleaseTests(unittest.TestCase):
             self._write_release_fixture(repository)
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "v1.0.0"], cwd=repository, check=True)
+            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
             dirty_body = "### Added\n\nDIRTY PRIVATE NOTE\n"
             (repository / "CHANGELOG.md").write_text(
                 "# Changelog\n\n## [Unreleased]\n\n## [1.0.0] - 2026-09-07\n\n" + dirty_body
@@ -115,6 +116,25 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(0, notes.returncode, notes.stderr)
         self.assertIn("Initial Fish module", notes.stdout)
         self.assertNotIn("DIRTY PRIVATE NOTE", notes.stdout)
+
+    def test_tag_required_verification_rejects_a_lightweight_tag(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
+            self._write_release_fixture(repository)
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            self._commit(repository, "release")
+            subprocess.run(["git", "tag", "v1.0.0"], cwd=repository, check=True)
+
+            result = subprocess.run(
+                [str(RELEASE_CHECK), "verify", "1.0.0", "--root", str(repository), "--notes", "docs/releases/1.0.0.md", "--tag-required"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("must be an annotated tag", result.stderr)
 
     def test_verify_rejects_external_notes_path_duplicate_version_and_wrong_h1(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -157,6 +177,53 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("exactly one dated [1.0.0] section", duplicate.stderr)
         self.assertNotEqual(0, wrong_h1.returncode)
         self.assertIn("must begin with # 1.0.0", wrong_h1.stderr)
+
+    def test_verify_rejects_duplicate_unreleased_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
+            self._write_release_fixture(repository)
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            self._commit(repository, "release")
+            changelog = repository / "CHANGELOG.md"
+            changelog.write_text(changelog.read_text() + "\n## [Unreleased]\n\n### Added\n\nUnexpected\n")
+
+            result = subprocess.run(
+                [str(RELEASE_CHECK), "verify", "1.0.0", "--root", str(repository), "--notes", "docs/releases/1.0.0.md"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("exactly one fresh, empty [Unreleased] section", result.stderr)
+
+    def test_publish_does_not_call_gh_when_local_release_input_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory) / "repository"
+            repository.mkdir()
+            subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
+            self._write_release_fixture(repository)
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            self._commit(repository, "release")
+            bin_directory = Path(directory) / "bin"
+            bin_directory.mkdir()
+            marker = Path(directory) / "gh-called"
+            fake_gh = bin_directory / "gh"
+            fake_gh.write_text(f"#!/bin/sh\ntouch '{marker}'\n")
+            fake_gh.chmod(0o755)
+            environment = {"PATH": f"{bin_directory}:/usr/bin:/bin"}
+
+            result = subprocess.run(
+                [str(PUBLISH_RELEASE), "1.0.0", "--root", str(repository)],
+                text=True,
+                capture_output=True,
+                check=False,
+                env=environment,
+            )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertFalse(marker.exists())
 
     def test_verify_rejects_a_symlinked_release_input(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -201,7 +268,7 @@ class ReleaseTests(unittest.TestCase):
             )
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "v1.0.0"], cwd=repository, check=True)
+            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
             consumer = Path(directory) / "consumer-config.fish"
             consumer.write_text("set -gx EDITOR vi\n")
             before = hashlib.sha256(consumer.read_bytes()).hexdigest()

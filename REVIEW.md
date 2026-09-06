@@ -8,7 +8,7 @@ This policy is the single source of truth for deterministic checks, active Confi
 - **Full deterministic check**: inspect tracked and untracked, non-ignored repository content.
 - **Local pull-request AI review**: before creating or updating a pull request, inspect only the tracked diff against `origin/main`, this policy, and the minimum module context needed to judge that diff.
 
-Local Consumer State, Consumer Configurations, backups, ignored files, unrelated filesystem content, and user environment data stay outside every review input.
+Local Consumer State, Consumer Configurations, backups, ignored files, unrelated filesystem content, and user environment data stay outside every review input. After the deterministic check passes, `scripts/review-context origin/main` emits the tracked diff, this policy, and affected module README files as the complete local semantic-review input.
 
 ## Deterministic Blocking Findings
 

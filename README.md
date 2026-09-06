@@ -1,0 +1,25 @@
+# AI-first configuration knowledge base
+
+This repository contains sanitized Reference Configurations and the knowledge needed for an AI to adapt them to a person's existing setup. It is not an installer, a home-directory mirror, or a promise that any configuration should be copied unchanged.
+
+Choose only the Application Module you need. Each root-level module explains its own supported environment, prerequisites, target location, capabilities, subjective Maintainer Preferences, conflicts, and safe validation. Your configuration remains yours and is never synchronized with this repository.
+
+## Copyable prompt
+
+Replace the bracketed text, then give this prompt to an AI that can read this clone and your configuration files:
+
+```text
+Help me configure [application] using this repository as a Configuration Knowledge Base.
+
+Read AGENTS.md, REVIEW.md, and the relevant application README before proposing changes. First understand my goal and inspect my existing configuration, application version, operating system, and available dependencies. Do not copy the reference unchanged and do not modify anything yet.
+
+Present the smallest plan that satisfies my goal. Explain behavior changes, prerequisites, conflicts, Maintainer Preferences, validation, and the recovery path. Ask for confirmation before changing behavior, overwriting files, installing anything, or restarting an application. After confirmation, preserve unrelated settings, make the agreed change, and run only safe validation. On failure, stop, show the diagnostic, and ask before applying the recovery path. On success, save my current goal, reasons, and the reviewed upstream release or commit beside my configuration when possible.
+
+I want help with: [goal]
+```
+
+The first complete module is [Fish](fish/README.md). More applications can be added independently without requiring users or AI tools to inspect unrelated modules.
+
+## Repository maintenance
+
+Repository changes follow [AGENTS.md](AGENTS.md) and the shared [Review Policy](REVIEW.md). Known secret and privacy patterns are checked locally at commit time and again in GitHub Actions. Semantic Configuration Audits run in the maintainer's existing local AI session and are recorded in the pull request.

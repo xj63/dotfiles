@@ -20,6 +20,17 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.13"
+      - name: Install pinned Fish for module validation
+        run: |
+          curl --fail --silent --show-error --location \
+            https://github.com/fish-shell/fish-shell/releases/download/4.9.2/fish-4.9.2-linux-x86_64.tar.xz \
+            --output "$RUNNER_TEMP/fish.tar.xz"
+          printf '%s  %s\n' \
+            '677f352e4ed8f8ba35295754b17ed2f08d228abaf9344a8b1b2715afa5c80814' \
+            "$RUNNER_TEMP/fish.tar.xz" | sha256sum --check
+          tar --extract --xz --file "$RUNNER_TEMP/fish.tar.xz" --directory "$RUNNER_TEMP"
+          sudo install --mode 0755 "$RUNNER_TEMP/fish" /usr/local/bin/fish
+          test "$(fish --version)" = 'fish, version 4.9.2'
       - name: Run acceptance tests
         run: python3 -m unittest discover -s tests -v
       - name: Check repository content

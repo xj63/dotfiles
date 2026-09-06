@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import os
 import re
@@ -230,15 +231,6 @@ def change_information_findings(
     mode: str,
     modules: set[str],
 ) -> list[Finding]:
-    def diff(*arguments: str) -> str:
-        return subprocess.run(
-            ["git", "diff", "--no-ext-diff", "--no-textconv", *arguments],
-            cwd=root,
-            text=True,
-            capture_output=True,
-            check=True,
-        ).stdout
-
     if mode == "staged":
         prior = "HEAD"
         changed = git_paths(
@@ -249,7 +241,6 @@ def change_information_findings(
             "--diff-filter=ACMRD",
             "-z",
         )
-        changelog_diffs = [diff("--cached", "--unified=0", "--", "CHANGELOG.md")]
         current_changelog = repository_text(root, mode, "CHANGELOG.md") or ""
     else:
         base = subprocess.run(
@@ -294,31 +285,33 @@ def change_information_findings(
         )
         untracked = git_paths(root, "ls-files", "--others", "--exclude-standard", "-z")
         changed = sorted(set(committed + worktree + untracked))
-        changelog_diffs = [diff("--unified=0", "HEAD", "--", "CHANGELOG.md")]
-        if base.returncode == 0:
-            changelog_diffs.append(
-                diff("--unified=0", "origin/main...HEAD", "--", "CHANGELOG.md")
-            )
         current_changelog = repository_text(root, mode, "CHANGELOG.md") or ""
-        if "CHANGELOG.md" in untracked:
-            changelog_diffs.append("\n".join(f"+{line}" for line in current_changelog.splitlines()))
 
-    in_unreleased = False
-    unreleased_lines: set[str] = set()
-    for line in current_changelog.splitlines():
-        if line.strip() == "## [Unreleased]":
-            in_unreleased = True
-            continue
-        if in_unreleased and line.startswith("## "):
-            break
-        if in_unreleased:
-            unreleased_lines.add(line)
-    added_lines = {
-        line[1:]
-        for changelog in changelog_diffs
-        for line in changelog.splitlines()
-        if line.startswith("+") and not line.startswith("+++")
-    }
+    prior_result = subprocess.run(
+        ["git", "show", f"{prior}:CHANGELOG.md"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    prior_changelog = prior_result.stdout if prior_result.returncode == 0 else ""
+
+    def unreleased_lines(changelog: str) -> list[str]:
+        in_unreleased = False
+        lines: list[str] = []
+        for line in changelog.splitlines():
+            if line.strip() == "## [Unreleased]":
+                in_unreleased = True
+                continue
+            if in_unreleased and line.startswith("## "):
+                break
+            if in_unreleased:
+                lines.append(line)
+        return lines
+
+    new_unreleased = Counter(unreleased_lines(current_changelog)) - Counter(
+        unreleased_lines(prior_changelog)
+    )
     changed_roots = {
         Path(path).parts[0]
         for path in changed
@@ -347,8 +340,8 @@ def change_information_findings(
             re.IGNORECASE,
         )
         if not any(
-            line in unreleased_lines and entry.fullmatch(line)
-            for line in added_lines
+            count > 0 and entry.fullmatch(line)
+            for line, count in new_unreleased.items()
         ):
             findings.append(Finding(
                 "module.change-information",

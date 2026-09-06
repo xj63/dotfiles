@@ -191,6 +191,23 @@ class ApplicationModuleContractTests(unittest.TestCase):
 
         self.assert_failure(result, "module.change-information", "nova/settings.toml")
 
+    def test_repeating_an_existing_unreleased_line_in_a_release_does_not_count(self) -> None:
+        entry = "- **Nova / behavior**: Existing generic note."
+        self.write_conforming_module()
+        self.write("CHANGELOG.md", f"# Changelog\n\n## [Unreleased]\n\n{entry}\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("baseline")
+        self.write("nova/settings.toml", "# changed\nfocus = true\n")
+        self.write(
+            "CHANGELOG.md",
+            f"# Changelog\n\n## [Unreleased]\n\n{entry}\n\n## [1.0.0]\n\n{entry}\n",
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+
+        result = self.check("staged")
+
+        self.assert_failure(result, "module.change-information", "nova/settings.toml")
+
     def test_full_check_does_not_follow_a_symlinked_module_directory(self) -> None:
         self.write_conforming_module()
         subprocess.run(["git", "add", "."], cwd=self.repository, check=True)

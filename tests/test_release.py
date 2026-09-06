@@ -61,7 +61,7 @@ class ReleaseTests(unittest.TestCase):
             self._write_release_fixture(repository)
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
+            self._annotated_tag(repository, "v1.0.0")
             (repository / "later.txt").write_text("later\n")
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "later")
@@ -92,7 +92,7 @@ class ReleaseTests(unittest.TestCase):
             self._write_release_fixture(repository)
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
+            self._annotated_tag(repository, "v1.0.0")
             dirty_body = "### Added\n\nDIRTY PRIVATE NOTE\n"
             (repository / "CHANGELOG.md").write_text(
                 "# Changelog\n\n## [Unreleased]\n\n## [1.0.0] - 2026-09-07\n\n" + dirty_body
@@ -268,7 +268,7 @@ class ReleaseTests(unittest.TestCase):
             )
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
             self._commit(repository, "release")
-            subprocess.run(["git", "tag", "--annotate", "v1.0.0", "--message", "v1.0.0"], cwd=repository, check=True)
+            self._annotated_tag(repository, "v1.0.0")
             consumer = Path(directory) / "consumer-config.fish"
             consumer.write_text("set -gx EDITOR vi\n")
             before = hashlib.sha256(consumer.read_bytes()).hexdigest()
@@ -318,6 +318,25 @@ class ReleaseTests(unittest.TestCase):
                 "--quiet",
                 "-m",
                 message,
+            ],
+            cwd=repository,
+            check=True,
+        )
+
+    @staticmethod
+    def _annotated_tag(repository: Path, tag: str) -> None:
+        subprocess.run(
+            [
+                "git",
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=user@example.com",
+                "tag",
+                "--annotate",
+                tag,
+                "--message",
+                tag,
             ],
             cwd=repository,
             check=True,

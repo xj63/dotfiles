@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(git rev-parse --show-toplevel)
+git -C "$repository_root" config --local core.hooksPath .githooks
+printf '%s\n' "Installed repository hooks from .githooks."

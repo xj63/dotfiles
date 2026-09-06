@@ -17,3 +17,7 @@ This repository uses a single-context domain-documentation layout. See `docs/age
 ### Architecture
 
 When changing the repository layout, application modules, consumer-AI workflow, review gates, or release process, read `docs/architecture.md` and the relevant ADRs under `docs/adr/` first.
+
+### Review policy
+
+Before committing repository changes or auditing configuration safety, read `REVIEW.md`. Install the versioned commit hook with `scripts/install-hooks`; use `scripts/check all` for a full deterministic check.

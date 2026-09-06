@@ -16,9 +16,11 @@ It is not a dotfile installer, a home-directory mirror, or a synchronization ser
 ├── CHANGELOG.md
 ├── REVIEW.md
 ├── .gitignore
-├── .pre-commit-config.yaml
+├── .githooks/
+│   └── pre-commit
 ├── scripts/
-│   └── check
+│   ├── check
+│   └── install-hooks
 ├── .github/workflows/
 │   ├── checks.yml
 │   └── ai-review.yml

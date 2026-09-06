@@ -163,6 +163,36 @@ class ApplicationModuleContractTests(unittest.TestCase):
 
         self.assert_failure(result, "module.change-information", "nova/settings.toml")
 
+    def test_full_check_uses_merge_base_when_main_releases_existing_entries(self) -> None:
+        existing = "- **Nova / behavior**: Existing baseline capability."
+        self.write_conforming_module()
+        self.write("CHANGELOG.md", f"# Changelog\n\n## [Unreleased]\n\n{existing}\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("shared baseline")
+        baseline = self.git("rev-parse", "HEAD").strip()
+        subprocess.run(["git", "checkout", "-b", "feature"], cwd=self.repository, check=True, capture_output=True)
+        self.write("nova/settings.toml", "# undocumented feature change\nfocus = true\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("feature change")
+        feature = self.git("rev-parse", "HEAD").strip()
+        subprocess.run(["git", "checkout", "--detach", baseline], cwd=self.repository, check=True, capture_output=True)
+        self.write(
+            "CHANGELOG.md",
+            f"# Changelog\n\n## [Unreleased]\n\n## [1.0.0]\n\n{existing}\n",
+        )
+        subprocess.run(["git", "add", "CHANGELOG.md"], cwd=self.repository, check=True)
+        self.commit("release main")
+        subprocess.run(
+            ["git", "update-ref", "refs/remotes/origin/main", "HEAD"],
+            cwd=self.repository,
+            check=True,
+        )
+        subprocess.run(["git", "checkout", "--detach", feature], cwd=self.repository, check=True, capture_output=True)
+
+        result = self.check("all")
+
+        self.assert_failure(result, "module.change-information", "nova/settings.toml")
+
     def test_full_check_includes_uncommitted_worktree_module_changes(self) -> None:
         self.write_conforming_module()
         self.write("CHANGELOG.md", "# Changelog\n\n## [Unreleased]\n")
@@ -295,6 +325,15 @@ class ApplicationModuleContractTests(unittest.TestCase):
             cwd=self.repository,
             check=True,
         )
+
+    def git(self, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=self.repository,
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout
 
     def assert_failure(
         self,

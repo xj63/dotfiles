@@ -1,0 +1,26 @@
+name: Deterministic checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: deterministic-checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Run acceptance tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Check repository content
+        run: scripts/check all

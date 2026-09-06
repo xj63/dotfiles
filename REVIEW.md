@@ -26,6 +26,7 @@ Local Consumer State, Consumer Configurations, backups, ignored files, unrelated
 | `policy.local-consumer-state` | Content under the Local Consumer State boundary becomes tracked. | Remove it from Git and keep it ignored. |
 | `policy.tracked-backup` | A recognized backup path becomes tracked. Its contents are not read by the audit. | Remove it from Git and keep backups outside the repository or ignored. |
 | `syntax.json` | A JSON Reference Configuration cannot be parsed. | Correct the syntax before publishing it. |
+| `module.english-readme` | A root-level Application Module has content but no normative English `README.md`. | Add the human-readable English source before module guidance or configuration. |
 | `module.target-guidance` | A discovered Application Module does not state a portable real target location. | Add natural-language placement guidance and a portable target path. |
 | `module.prerequisite-guidance` | A discovered module does not explain required prerequisites or dependencies. | State what is required, including when no external dependency is needed. |
 | `module.validation-guidance` | A discovered module does not explain safe validation. | Add the applicable read-only or side-effect-free validation method. |

@@ -80,7 +80,7 @@ class RepositoryCheckTests(unittest.TestCase):
 
     def test_full_check_accepts_an_explicit_public_identity_exception(self) -> None:
         email = "maintainer" + "@public.example.dev"
-        self.write("fish/config.fish", f"# Public contact: {email}\n")
+        self.write("CONTACT.md", f"Public contact: {email}\n")
         self.write(
             "review-allowlist.txt",
             f"{email}\tPublished project contact address\n",
@@ -112,8 +112,8 @@ class RepositoryCheckTests(unittest.TestCase):
             cwd=self.repository,
             check=True,
         )
-        self.write("fish/config.fish", f"# Public contact: {email}\n")
-        subprocess.run(["git", "add", "fish/config.fish"], cwd=self.repository, check=True)
+        self.write("CONTACT.md", f"Public contact: {email}\n")
+        subprocess.run(["git", "add", "CONTACT.md"], cwd=self.repository, check=True)
 
         result = self.run_check("staged")
 

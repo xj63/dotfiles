@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -59,6 +60,18 @@ class ApplicationModuleContractTests(unittest.TestCase):
 
         self.assert_failure(result, "module.validation-guidance", "nova/README.md")
 
+    def test_accepts_clear_natural_language_synonyms(self) -> None:
+        self.write_conforming_module()
+        self.write(
+            "nova/README.md",
+            "# Nova\n\nNova 2 must be installed. Save `settings.toml` under "
+            "`$XDG_CONFIG_HOME/nova/`. Run `nova --check settings.toml` before use.\n",
+        )
+
+        result = self.check("all")
+
+        self.assertEqual(0, result.returncode, result.stdout)
+
     def test_existing_privacy_rules_apply_to_discovered_modules(self) -> None:
         self.write_conforming_module()
         private_path = "/Users/" + "fixture-user/.config/nova/settings.toml"
@@ -76,6 +89,25 @@ class ApplicationModuleContractTests(unittest.TestCase):
         result = self.check("all")
 
         self.assert_failure(result, "module.translation-source", "nova/README.zh-CN.md")
+
+    def test_configuration_without_english_readme_is_still_a_module(self) -> None:
+        self.write("nova/settings.json", '{"focus": true,}\n')
+
+        result = self.check("all")
+
+        self.assert_failure(result, "module.english-readme", "nova/README.md")
+        self.assertIn("BLOCKING [syntax.json] nova/settings.json:1", result.stdout)
+
+    def test_translation_without_english_readme_cannot_be_normative(self) -> None:
+        self.write(
+            "nova/README.zh-CN.md",
+            "# Nova 中文入口\n\nEnglish README.md is normative.\n",
+        )
+        self.write("nova/settings.toml", "# capability\nfocus = true\n")
+
+        result = self.check("all")
+
+        self.assert_failure(result, "module.english-readme", "nova/README.md")
 
     def test_staged_module_change_requires_categorized_change_information(self) -> None:
         self.write_conforming_module()
@@ -130,6 +162,77 @@ class ApplicationModuleContractTests(unittest.TestCase):
         result = self.check("all")
 
         self.assert_failure(result, "module.change-information", "nova/settings.toml")
+
+    def test_full_check_includes_uncommitted_worktree_module_changes(self) -> None:
+        self.write_conforming_module()
+        self.write("CHANGELOG.md", "# Changelog\n\n## [Unreleased]\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("baseline")
+        self.write("nova/settings.toml", "# changed in worktree\nfocus = true\n")
+
+        result = self.check("all")
+
+        self.assert_failure(result, "module.change-information", "nova/settings.toml")
+
+    def test_change_information_must_be_added_under_unreleased(self) -> None:
+        self.write_conforming_module()
+        self.write("CHANGELOG.md", "# Changelog\n\n## [Unreleased]\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("baseline")
+        self.write("nova/settings.toml", "# changed\nfocus = true\n")
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n## [1.0.0]\n\n"
+            "- **Nova / behavior**: Change focus mode. Existing users may decline.\n",
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+
+        result = self.check("staged")
+
+        self.assert_failure(result, "module.change-information", "nova/settings.toml")
+
+    def test_full_check_does_not_follow_a_symlinked_module_directory(self) -> None:
+        self.write_conforming_module()
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("baseline")
+        external = Path(self.temp_directory.name) / "external"
+        external.mkdir()
+        (external / "README.md").write_text("external-private-marker\n")
+        (external / "settings.toml").write_text("external-config-marker\n")
+        shutil.rmtree(self.repository / "nova")
+        (self.repository / "nova").symlink_to(external, target_is_directory=True)
+
+        result = self.check("all")
+
+        self.assertNotIn("external-private-marker", result.stdout)
+        self.assertNotIn("external-config-marker", result.stdout)
+
+    def test_change_information_check_does_not_run_textconv(self) -> None:
+        self.write_conforming_module()
+        self.write(".gitattributes", "CHANGELOG.md diff=changelog\n")
+        self.write("CHANGELOG.md", "# Changelog\n\n## [Unreleased]\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("baseline")
+        marker = Path(self.temp_directory.name) / "textconv-ran"
+        helper = Path(self.temp_directory.name) / "textconv"
+        helper.write_text(f"#!/bin/sh\ntouch '{marker}'\ncat \"$1\"\n")
+        helper.chmod(0o755)
+        subprocess.run(
+            ["git", "config", "diff.changelog.textconv", str(helper)],
+            cwd=self.repository,
+            check=True,
+        )
+        self.write("nova/settings.toml", "# changed\nfocus = true\n")
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n## [1.0.0]\n\nHistorical note.\n",
+        )
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+
+        result = self.check("staged")
+
+        self.assert_failure(result, "module.change-information", "nova/settings.toml")
+        self.assertFalse(marker.exists())
 
     def write_conforming_module(self) -> None:
         self.write(

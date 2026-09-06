@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import os
 import re
@@ -32,6 +33,11 @@ HARDCODED_CREDENTIAL = re.compile(
 )
 PLACEHOLDER_WORDS = ("example", "placeholder", "changeme", "replace-me")
 PRIVATE_KEY = re.compile(r"-----BEGIN (?:[A-Z0-9]+ )?PRIVATE KEY-----")
+PORTABLE_TARGET = re.compile(r"`[^`]*(?:/|\\)[^`]*`")
+PREREQUISITE_GUIDANCE = re.compile(
+    r"(?i)\b(?:prerequisites?|required|requires|needs?|dependenc(?:y|ies)|must be installed)\b"
+)
+VALIDATION_GUIDANCE = re.compile(r"(?i)\b(?:validate|validation|check|test)\b")
 
 
 @dataclass(frozen=True)
@@ -89,17 +95,26 @@ def repository_content(root: Path, mode: str) -> list[tuple[str, bytes]]:
     paths = git_paths(root, "ls-files", "--cached", "--others", "--exclude-standard", "-z")
     contents: list[tuple[str, bytes]] = []
     for path in paths:
-        absolute_path = root / path
         if is_local_state(path):
             contents.append((path, b""))
         elif is_backup_path(path):
             if path in tracked_paths:
                 contents.append((path, b""))
-        elif absolute_path.is_symlink():
-            contents.append((path, os.readlink(absolute_path).encode("utf-8")))
-        elif absolute_path.is_file():
-            contents.append((path, absolute_path.read_bytes()))
+        else:
+            content = safe_worktree_bytes(root, path)
+            if content is not None:
+                contents.append((path, content))
     return contents
+
+
+def safe_worktree_bytes(root: Path, path: str) -> bytes | None:
+    current = root
+    parts = Path(path).parts
+    for index, part in enumerate(parts):
+        current = current / part
+        if current.is_symlink():
+            return os.readlink(current).encode("utf-8") if index == len(parts) - 1 else None
+    return current.read_bytes() if current.is_file() else None
 
 
 def is_local_state(path: str) -> bool:
@@ -125,6 +140,228 @@ def index_content(root: Path, path: str) -> bytes:
     ).stdout
 
 
+def repository_paths(root: Path, mode: str) -> list[str]:
+    if mode == "staged":
+        return git_paths(root, "ls-files", "-z")
+    return git_paths(root, "ls-files", "--cached", "--others", "--exclude-standard", "-z")
+
+
+def repository_text(root: Path, mode: str, path: str) -> str | None:
+    if mode == "staged":
+        result = subprocess.run(
+            ["git", "show", f":{path}"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+        )
+        content = result.stdout if result.returncode == 0 else None
+    else:
+        content = safe_worktree_bytes(root, path)
+    if content is None:
+        return None
+    try:
+        return content.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def application_modules(paths: list[str]) -> set[str]:
+    return {
+        Path(path).parts[0]
+        for path in paths
+        if len(Path(path).parts) > 1
+        and not Path(path).parts[0].startswith(".")
+        and Path(path).parts[0] not in INFRASTRUCTURE_ROOTS
+    }
+
+
+def module_contract_findings(root: Path, mode: str) -> list[Finding]:
+    paths = repository_paths(root, mode)
+    modules = application_modules(paths)
+    findings: list[Finding] = []
+    for module in sorted(modules):
+        readme_path = f"{module}/README.md"
+        readme = repository_text(root, mode, readme_path)
+        if readme is None:
+            findings.append(Finding(
+                "module.english-readme",
+                readme_path,
+                1,
+                "Application Module must provide a normative English README.md.",
+            ))
+            readme = ""
+        if not PORTABLE_TARGET.search(readme):
+            findings.append(Finding(
+                "module.target-guidance",
+                readme_path,
+                1,
+                "Module guidance must state the real, portable target configuration location.",
+            ))
+        if not PREREQUISITE_GUIDANCE.search(readme):
+            findings.append(Finding(
+                "module.prerequisite-guidance",
+                readme_path,
+                1,
+                "Module guidance must explain required prerequisites or dependencies.",
+            ))
+        if not VALIDATION_GUIDANCE.search(readme):
+            findings.append(Finding(
+                "module.validation-guidance",
+                readme_path,
+                1,
+                "Module guidance must explain a safe validation method.",
+            ))
+        for path in paths:
+            if not path.startswith(f"{module}/README.") or path == readme_path:
+                continue
+            translation = (repository_text(root, mode, path) or "").casefold()
+            if not all(term in translation for term in ("english", "normative", "readme.md")):
+                findings.append(Finding(
+                    "module.translation-source",
+                    path,
+                    1,
+                    "Translation must link to README.md and state that the English README is normative.",
+                ))
+    findings.extend(change_information_findings(root, mode, modules))
+    return findings
+
+
+def change_information_findings(
+    root: Path,
+    mode: str,
+    modules: set[str],
+) -> list[Finding]:
+    if mode == "staged":
+        prior = "HEAD"
+        changed = git_paths(
+            root,
+            "diff",
+            "--cached",
+            "--name-only",
+            "--diff-filter=ACMRD",
+            "-z",
+        )
+        current_changelog = repository_text(root, mode, "CHANGELOG.md") or ""
+    else:
+        base = subprocess.run(
+            ["git", "rev-parse", "--verify", "origin/main^{commit}"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        head = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD^{commit}"],
+            cwd=root,
+            capture_output=True,
+            check=False,
+        )
+        if head.returncode:
+            return []
+        if base.returncode == 0:
+            merge_base = subprocess.run(
+                ["git", "merge-base", "origin/main", "HEAD"],
+                cwd=root,
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+            prior = merge_base.stdout.strip()
+        else:
+            prior = "HEAD"
+        committed = (
+            git_paths(
+                root,
+                "diff",
+                "--no-ext-diff",
+                "--no-textconv",
+                "--name-only",
+                "--diff-filter=ACMRD",
+                "-z",
+                "origin/main...HEAD",
+            )
+            if base.returncode == 0
+            else []
+        )
+        worktree = git_paths(
+            root,
+            "diff",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--name-only",
+            "--diff-filter=ACMRD",
+            "-z",
+            "HEAD",
+        )
+        untracked = git_paths(root, "ls-files", "--others", "--exclude-standard", "-z")
+        changed = sorted(set(committed + worktree + untracked))
+        current_changelog = repository_text(root, mode, "CHANGELOG.md") or ""
+
+    prior_result = subprocess.run(
+        ["git", "show", f"{prior}:CHANGELOG.md"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    prior_changelog = prior_result.stdout if prior_result.returncode == 0 else ""
+
+    def unreleased_lines(changelog: str) -> list[str]:
+        in_unreleased = False
+        lines: list[str] = []
+        for line in changelog.splitlines():
+            if line.strip() == "## [Unreleased]":
+                in_unreleased = True
+                continue
+            if in_unreleased and line.startswith("## "):
+                break
+            if in_unreleased:
+                lines.append(line)
+        return lines
+
+    new_unreleased = Counter(unreleased_lines(current_changelog)) - Counter(
+        unreleased_lines(prior_changelog)
+    )
+    changed_roots = {
+        Path(path).parts[0]
+        for path in changed
+        if len(Path(path).parts) > 1
+        and not Path(path).parts[0].startswith(".")
+        and Path(path).parts[0] not in INFRASTRUCTURE_ROOTS
+    }
+    prior_modules = {
+        candidate
+        for candidate in changed_roots
+        if subprocess.run(
+            ["git", "cat-file", "-e", f"{prior}:{candidate}/README.md"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+        ).returncode
+        == 0
+    }
+    findings: list[Finding] = []
+    for module in sorted(modules | prior_modules):
+        module_changes = [path for path in changed if path.startswith(f"{module}/")]
+        if not module_changes:
+            continue
+        entry = re.compile(
+            rf"^- \*\*{re.escape(module)} / [^*]+\*\*: .+",
+            re.IGNORECASE,
+        )
+        if not any(
+            count > 0 and entry.fullmatch(line)
+            for line, count in new_unreleased.items()
+        ):
+            findings.append(Finding(
+                "module.change-information",
+                module_changes[0],
+                1,
+                f"User-affecting {module} changes require a categorized [Unreleased] entry.",
+            ))
+    return findings
+
+
 def is_application_configuration(root: Path, mode: str, path: str) -> bool:
     parts = Path(path).parts
     if (
@@ -133,18 +370,7 @@ def is_application_configuration(root: Path, mode: str, path: str) -> bool:
         or parts[0] in INFRASTRUCTURE_ROOTS
     ):
         return False
-    module_readme = f"{parts[0]}/README.md"
-    if mode == "all":
-        return (root / module_readme).is_file()
-    return (
-        subprocess.run(
-            ["git", "cat-file", "-e", f":{module_readme}"],
-            cwd=root,
-            check=False,
-            capture_output=True,
-        ).returncode
-        == 0
-    )
+    return True
 
 
 def approved_identities(
@@ -193,6 +419,7 @@ def main() -> int:
         arguments.mode,
         contents,
     )
+    findings.extend(module_contract_findings(arguments.root, arguments.mode))
     for relative_path, content in contents:
         if is_local_state(relative_path):
             findings.append(Finding(

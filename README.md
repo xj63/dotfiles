@@ -31,3 +31,5 @@ Review Fish changes after the Review Cursor in my current intent record. Follow 
 ## Repository maintenance
 
 Repository changes follow [AGENTS.md](AGENTS.md) and the shared [Review Policy](REVIEW.md). Known secret and privacy patterns are checked locally at commit time and again in GitHub Actions. Semantic Configuration Audits run in the maintainer's existing local AI session and are recorded in the pull request.
+
+Contributor AIs add independent root-level modules using the natural-language [Application Module authoring guide](docs/application-modules.md). No module manifest is required.

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import re
 import subprocess
 import sys
@@ -36,6 +37,44 @@ def section(document: str, heading: str) -> str | None:
     return "\n".join(lines[start:end]).strip()
 
 
+def safe_worktree_text(root: Path, relative_path: str) -> str:
+    current = root
+    for part in Path(relative_path).parts:
+        current = current / part
+        if current.is_symlink():
+            raise ValueError(f"Release input must not be a symlink: {relative_path}")
+    if not current.is_file():
+        raise ValueError(f"Release input is missing: {relative_path}")
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", relative_path],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    if tracked.returncode:
+        raise ValueError(f"Release input must be tracked: {relative_path}")
+    return current.read_text()
+
+
+def tagged_text(root: Path, tag: str, relative_path: str) -> str:
+    tree = subprocess.run(
+        ["git", "ls-tree", tag, "--", relative_path],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    if not tree or not tree.startswith(("100644 ", "100755 ")):
+        raise ValueError(f"Tagged release input must be a regular file: {relative_path}")
+    return subprocess.run(
+        ["git", "show", f"{tag}:{relative_path}"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -46,6 +85,9 @@ def main() -> int:
     verify.add_argument("--root", type=Path, default=Path.cwd())
     verify.add_argument("--notes", type=Path, required=True)
     verify.add_argument("--tag-required", action="store_true")
+    notes = subparsers.add_parser("notes")
+    notes.add_argument("version")
+    notes.add_argument("--root", type=Path, default=Path.cwd())
     arguments = parser.parse_args()
 
     if arguments.command == "classify":
@@ -56,32 +98,22 @@ def main() -> int:
         print("Version must be a stable Semantic Version such as 1.2.3", file=sys.stderr)
         return 2
     root = arguments.root.resolve()
-    changelog = (root / "CHANGELOG.md").read_text()
-    unreleased = section(changelog, "## [Unreleased]")
-    if unreleased is None or unreleased:
-        print("CHANGELOG must retain a fresh, empty [Unreleased] section", file=sys.stderr)
-        return 1
-    release_heading = next(
-        (
-            line
-            for line in changelog.splitlines()
-            if re.fullmatch(rf"## \[{re.escape(arguments.version)}\] - \d{{4}}-\d{{2}}-\d{{2}}", line)
-        ),
-        None,
-    )
-    if release_heading is None:
-        print(f"CHANGELOG has no dated [{arguments.version}] section", file=sys.stderr)
-        return 1
-    release_body = section(changelog, release_heading)
-    notes_path = arguments.notes if arguments.notes.is_absolute() else root / arguments.notes
-    notes_lines = notes_path.read_text().splitlines()
-    notes_body = "\n".join(notes_lines[1:]).strip() if notes_lines and notes_lines[0].startswith("# ") else ""
-    if not release_body or release_body != notes_body:
-        print("GitHub Release notes are not equivalent to the CHANGELOG release section", file=sys.stderr)
+    expected_notes = f"docs/releases/{arguments.version}.md"
+    tag_name = f"v{arguments.version}"
+    if arguments.command == "notes":
+        try:
+            print(tagged_text(root, tag_name, expected_notes), end="")
+        except (ValueError, subprocess.CalledProcessError) as error:
+            print(error, file=sys.stderr)
+            return 1
+        return 0
+
+    if arguments.notes.is_absolute() or arguments.notes.as_posix() != expected_notes:
+        print(f"Release notes must be {expected_notes}", file=sys.stderr)
         return 1
     if arguments.tag_required:
         tag = subprocess.run(
-            ["git", "rev-parse", "--verify", f"v{arguments.version}^{{commit}}"],
+            ["git", "rev-parse", "--verify", f"{tag_name}^{{commit}}"],
             cwd=root,
             text=True,
             capture_output=True,
@@ -95,8 +127,48 @@ def main() -> int:
             check=True,
         )
         if tag.returncode or tag.stdout.strip() != head.stdout.strip():
-            print(f"v{arguments.version} does not identify HEAD", file=sys.stderr)
+            print(f"{tag_name} does not identify HEAD", file=sys.stderr)
             return 1
+        try:
+            changelog = tagged_text(root, tag_name, "CHANGELOG.md")
+            notes_document = tagged_text(root, tag_name, expected_notes)
+        except (ValueError, subprocess.CalledProcessError) as error:
+            print(error, file=sys.stderr)
+            return 1
+    else:
+        try:
+            changelog = safe_worktree_text(root, "CHANGELOG.md")
+            notes_document = safe_worktree_text(root, expected_notes)
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            return 1
+    unreleased = section(changelog, "## [Unreleased]")
+    if unreleased is None or unreleased:
+        print("CHANGELOG must retain a fresh, empty [Unreleased] section", file=sys.stderr)
+        return 1
+    headings = re.findall(
+        rf"^## \[{re.escape(arguments.version)}\] - (\d{{4}}-\d{{2}}-\d{{2}})$",
+        changelog,
+        re.MULTILINE,
+    )
+    if len(headings) != 1:
+        print(f"CHANGELOG must contain exactly one dated [{arguments.version}] section", file=sys.stderr)
+        return 1
+    try:
+        date.fromisoformat(headings[0])
+    except ValueError:
+        print(f"CHANGELOG [{arguments.version}] date is invalid", file=sys.stderr)
+        return 1
+    release_heading = f"## [{arguments.version}] - {headings[0]}"
+    release_body = section(changelog, release_heading)
+    notes_lines = notes_document.splitlines()
+    if not notes_lines or notes_lines[0] != f"# {arguments.version}":
+        print(f"Release notes must begin with # {arguments.version}", file=sys.stderr)
+        return 1
+    notes_body = "\n".join(notes_lines[1:]).strip()
+    if not release_body or release_body != notes_body:
+        print("GitHub Release notes are not equivalent to the CHANGELOG release section", file=sys.stderr)
+        return 1
     print(f"Release {arguments.version} is consistent.")
     return 0
 

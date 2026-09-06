@@ -11,13 +11,13 @@ scripts/release-check verify X.Y.Z --notes docs/releases/X.Y.Z.md
 
 Complete the local Configuration Audit and record it on the PR. Merge only after the protected deterministic check passes. Semantic review remains the recorded local audit; GitHub requires no AI credential.
 
-On the updated clean `main`, verify the merge commit, create the matching annotated tag and GitHub Release from the committed notes, then verify consistency:
+On the updated clean `main`, verify the merge commit and create the matching annotated tag. Validate the local tag before making any remote change. Push it only after validation, then create the GitHub Release using notes read from the tag rather than the working tree:
 
 ```sh
 git tag --annotate vX.Y.Z --message "vX.Y.Z"
-git push origin vX.Y.Z
-gh release create vX.Y.Z --title "vX.Y.Z" --notes-file docs/releases/X.Y.Z.md --verify-tag
 scripts/release-check verify X.Y.Z --notes docs/releases/X.Y.Z.md --tag-required
+git push origin vX.Y.Z
+scripts/release-check notes X.Y.Z | gh release create vX.Y.Z --title "vX.Y.Z" --notes-file - --verify-tag
 ```
 
 Confirm the GitHub Release targets the same commit as the tag and its body matches the committed notes. A fresh consumer may record the tag as its initial Review Cursor. An existing consumer runs the selected module's update assessment from its earlier cursor; release publication never synchronizes its configuration.

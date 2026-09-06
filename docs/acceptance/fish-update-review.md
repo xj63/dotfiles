@@ -9,6 +9,9 @@ The maintainer's local AI exercised the update protocol against temporary upstre
 - `scripts/update-context <cursor> fish` reported the resolved `From` and `To` commits.
 - The output included both Fish entries and the Fish diff while excluding the WezTerm entry and configuration diff.
 - A Fish file change without added Fish change information stopped with an actionable diagnostic.
+- An older target and a target on divergent history both stopped because the Review Cursor was not an ancestor; neither produced a review range to advance.
+- A shared consumer-protocol-only change was reported with its repository-scoped change information, without requiring a false Fish-specific entry.
+- A target that removed the Fish module remained reviewable and reported `State: removed at target` with its migration guidance and deletion diff.
 - Generating the context received no Consumer Configuration path and left an external configuration plus its intent file byte-for-byte unchanged.
 
 ## Declined update

@@ -35,7 +35,7 @@ Consumer Configurations remain independent from this repository. Never synchroni
 
 ### Upstream update assessment
 
-When a user asks about newer repository changes, read the Review Cursor from their intent record and the update instructions in the selected module. Generate the application-scoped change context, then compare each relevant upstream intent and diff with the current Consumer Configuration. The impact report is complete when every relevant change is classified as already satisfied, applicable, conflicting, or irrelevant to the user's goal.
+When a user asks about newer repository changes, read the Review Cursor from their intent record and the update instructions in the selected module. Generate the application-scoped change context, then compare each relevant upstream intent and diff with the current Consumer Configuration. Stop if the cursor is not an ancestor of the target; resolve the expected history instead of treating a rollback or divergent branch as an update. The impact report is complete when every relevant change, including module removal and shared consumer-protocol changes, is classified as already satisfied, applicable, conflicting, or irrelevant to the user's goal.
 
 Present a focused impact report before proposing edits. A pull or a reviewed upstream change never authorizes configuration modification. Obtain confirmation for every behavior, dependency, or Maintainer Preference change. If the user declines the update, leave the Consumer Configuration and Review Cursor unchanged. If the user accepts a subset, establish recovery, apply only the accepted changes, validate, update current intent, and advance the Review Cursor to the reviewed upstream state.
 

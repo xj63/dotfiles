@@ -32,7 +32,14 @@ def git(root: Path, *arguments: str, check: bool = True) -> subprocess.Completed
 
 
 def resolve_commit(root: Path, reference: str) -> str:
-    result = git(root, "rev-parse", "--verify", f"{reference}^{{commit}}", check=False)
+    result = git(
+        root,
+        "rev-parse",
+        "--verify",
+        "--end-of-options",
+        f"{reference}^{{commit}}",
+        check=False,
+    )
     if result.returncode:
         raise ValueError(f"Review Cursor or target is not a commit: {reference}")
     return result.stdout.strip()
@@ -59,14 +66,33 @@ def main() -> int:
         print(error, file=sys.stderr)
         return 2
 
-    tracked = git(root, "ls-tree", "-r", "--name-only", target).stdout.splitlines()
-    modules = {
+    ancestry = git(root, "merge-base", "--is-ancestor", cursor, target, check=False)
+    if ancestry.returncode:
+        print(
+            "Review Cursor is not an ancestor of the target; fetch the expected history "
+            "or choose a target descended from the stored cursor.",
+            file=sys.stderr,
+        )
+        return 2
+
+    cursor_tracked = git(root, "ls-tree", "-r", "--name-only", cursor).stdout.splitlines()
+    target_tracked = git(root, "ls-tree", "-r", "--name-only", target).stdout.splitlines()
+    cursor_modules = {
         Path(path).parts[0]
-        for path in tracked
+        for path in cursor_tracked
+        if len(Path(path).parts) == 2 and Path(path).name == "README.md"
+    }
+    target_modules = {
+        Path(path).parts[0]
+        for path in target_tracked
         if len(Path(path).parts) == 2 and Path(path).name == "README.md"
     }
     module = next(
-        (candidate for candidate in modules if candidate.casefold() == arguments.application.casefold()),
+        (
+            candidate
+            for candidate in target_modules | cursor_modules
+            if candidate.casefold() == arguments.application.casefold()
+        ),
         None,
     )
     if module is None:
@@ -83,19 +109,26 @@ def main() -> int:
         "--",
         "CHANGELOG.md",
     ).stdout
-    entries: list[str] = []
+    application_entries: list[str] = []
+    shared_entries: list[str] = []
     for line in changelog_diff.splitlines():
         if not line.startswith("+") or line.startswith("+++"):
             continue
         candidate = line[1:]
         match = ENTRY.fullmatch(candidate)
-        if match and match.group("application").strip().casefold() == module.casefold():
-            if not match.group("category"):
+        if not match:
+            continue
+        entry_application = match.group("application").strip().casefold()
+        category = (match.group("category") or "").strip()
+        if entry_application == module.casefold():
+            if not category:
                 print(f"{module.title()} change information is missing a category", file=sys.stderr)
                 return 1
-            entries.append(candidate)
+            application_entries.append(candidate)
+        elif entry_application == "repository" and category.casefold() == "consumer protocol":
+            shared_entries.append(candidate)
 
-    module_diff = git(
+    application_diff = git(
         root,
         "diff",
         "--no-ext-diff",
@@ -104,23 +137,44 @@ def main() -> int:
         f"{cursor}..{target}",
         "--",
         module,
-        *SHARED_CONSUMER_PROTOCOL,
     ).stdout
-    if module_diff and not entries:
+    if application_diff and not application_entries:
         print(
             f"{module.title()} change information is required for changes after the Review Cursor",
             file=sys.stderr,
         )
         return 1
 
+    shared_diff = git(
+        root,
+        "diff",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--unified=3",
+        f"{cursor}..{target}",
+        "--",
+        *SHARED_CONSUMER_PROTOCOL,
+    ).stdout
+    relevant_shared_diff = shared_diff if application_entries or shared_entries else ""
+    entries = application_entries + shared_entries
+    state = (
+        "removed at target"
+        if module in cursor_modules and module not in target_modules
+        else "added at target"
+        if module not in cursor_modules and module in target_modules
+        else "present"
+    )
+
     print("=== REVIEW RANGE ===")
     print(f"From: {cursor}")
     print(f"To: {target}")
     print(f"Application: {module}")
+    print(f"State: {state}")
     print(f"\n=== {module.upper()} CHANGE INFORMATION ===")
     print("\n".join(entries) if entries else "No application change information in this range.")
     print(f"\n=== {module.upper()} RELEVANT TRACKED DIFF ===")
-    print(module_diff, end="")
+    print(application_diff, end="")
+    print(relevant_shared_diff, end="")
     return 0
 
 

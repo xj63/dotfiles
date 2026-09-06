@@ -71,7 +71,7 @@ After the user asks to review a newer clone or release, read the existing Fish i
 scripts/update-context <Review-Cursor> fish
 ```
 
-Use the reported `To` commit as the proposed next cursor. The command filters newly added change information and the tracked diff to Fish plus the shared consumer protocol; it does not inspect or modify the Consumer Configuration.
+Use the reported `To` commit as the proposed next cursor. The command filters newly added change information and the tracked diff to Fish plus the shared consumer protocol; it also reports when the module was added or removed. It stops when the current cursor is not an ancestor of `To`, because a rollback or divergent history is not a valid update. The command does not inspect or modify the Consumer Configuration.
 
 Compare every reported change with the user's current Fish files, current goal, environment, and selected capabilities. Produce a focused impact report that distinguishes behavior, dependency, Maintainer Preference, conflict, and documentation effects. The AI must not copy the newer Reference Configuration wholesale.
 

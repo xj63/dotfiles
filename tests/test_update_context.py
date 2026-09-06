@@ -82,6 +82,91 @@ class UpdateContextTests(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertIn("Fish change information", result.stderr)
 
+    def test_rejects_a_review_cursor_from_divergent_history(self) -> None:
+        self.write("fish/config.fish", "set --global fish_greeting\n# cursor branch\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("cursor branch")
+        divergent_cursor = self.git("rev-parse", "HEAD").strip()
+        subprocess.run(
+            ["git", "checkout", "--quiet", "-b", "target", self.cursor],
+            cwd=self.repository,
+            check=True,
+        )
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n### Changed\n\n"
+            "- **Fish / behavior**: Change greeting behavior. Existing users must review it.\n",
+        )
+        self.write("fish/config.fish", "set --global fish_greeting\n# target branch\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("target branch")
+        self.cursor = divergent_cursor
+
+        result = self.run_context("fish")
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("not an ancestor", result.stderr)
+        self.assertNotIn("=== REVIEW RANGE ===", result.stdout)
+
+    def test_rejects_a_target_older_than_the_review_cursor(self) -> None:
+        older_target = self.cursor
+        self.write("fish/config.fish", "set --global fish_greeting\n# newer cursor\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("newer cursor")
+        newer_cursor = self.git("rev-parse", "HEAD").strip()
+
+        result = subprocess.run(
+            [
+                str(UPDATE_CONTEXT),
+                newer_cursor,
+                "fish",
+                "--to",
+                older_target,
+                "--root",
+                str(self.repository),
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("not an ancestor", result.stderr)
+
+    def test_includes_shared_consumer_protocol_changes_without_a_fish_entry(self) -> None:
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n### Changed\n\n"
+            "- **repository / consumer protocol**: Clarify confirmation. Existing users need no migration.\n",
+        )
+        self.write("AGENTS.md", "# Agent guidance\n\nshared-protocol-marker\n")
+        subprocess.run(["git", "add", "."], cwd=self.repository, check=True)
+        self.commit("shared protocol update")
+
+        result = self.run_context("fish")
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("repository / consumer protocol", result.stdout)
+        self.assertIn("shared-protocol-marker", result.stdout)
+
+    def test_reports_a_module_removed_after_the_review_cursor(self) -> None:
+        self.write(
+            "CHANGELOG.md",
+            "# Changelog\n\n## [Unreleased]\n\n### Removed\n\n"
+            "- **Fish / module**: Remove the Fish module. Existing users should retain their configuration and cursor.\n",
+        )
+        (self.repository / "fish" / "README.md").unlink()
+        (self.repository / "fish" / "config.fish").unlink()
+        subprocess.run(["git", "add", "-A"], cwd=self.repository, check=True)
+        self.commit("remove Fish module")
+
+        result = self.run_context("fish")
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn("State: removed at target", result.stdout)
+        self.assertIn("deleted file mode", result.stdout)
+        self.assertIn("retain their configuration", result.stdout)
+
     @unittest.skipUnless(FISH, "Fish is required for partial-update acceptance")
     def test_partial_acceptance_preserves_declined_behavior_and_advances_cursor(self) -> None:
         self.write(

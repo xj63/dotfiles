@@ -62,3 +62,17 @@ This parses the file without executing its commands. If it fails, stop, show the
 8. On success, update the user's existing intent document with the current goal, reasons for non-obvious choices, and the upstream release or commit reviewed. If no convention exists, prefer useful comments in `config.fish`; when comments are unsuitable, propose a Markdown document such as `AI-INTENT.md` inside the Fish configuration directory and ask before creating it. Use ignored `.local/` state in this clone only when intent cannot live beside the Consumer Configuration and the user approves that fallback.
 
 Clone-local fallback state may record the Fish target location, current goal and reasons, and Review Cursor. It must not contain credentials, a copy of the Consumer Configuration, or backup contents. See [Private local fallback](../docs/local-consumer-state.md). A later AI session reads the selected intent record before proposing further Fish changes.
+
+## Reviewing upstream changes
+
+After the user asks to review a newer clone or release, read the existing Fish intent and run this read-only command from the knowledge-base clone:
+
+```sh
+scripts/update-context <Review-Cursor> fish
+```
+
+Use the reported `To` commit as the proposed next cursor. The command filters newly added change information and the tracked diff to Fish plus the shared consumer protocol; it does not inspect or modify the Consumer Configuration.
+
+Compare every reported change with the user's current Fish files, current goal, environment, and selected capabilities. Produce a focused impact report that distinguishes behavior, dependency, Maintainer Preference, conflict, and documentation effects. The AI must not copy the newer Reference Configuration wholesale.
+
+Ask before adopting any behavior, dependency, or Maintainer Preference change. If the user declines the update, keep both the Consumer Configuration and Review Cursor unchanged. For a partial acceptance, establish the Recovery Path, apply only the accepted changes, preserve unrelated and explicitly declined behavior, run safe validation, update the current intent and reasons, and advance the Review Cursor to the reported `To` commit. Advancing the cursor records that the entire range was reviewed, not that every upstream preference was adopted.

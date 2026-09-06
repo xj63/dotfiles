@@ -97,6 +97,8 @@ The repository uses Semantic Versioning. Breaking repository protocols or module
 
 After pulling upstream, a user's AI reads changes after the Review Cursor, filters them to relevant Application Modules, and inspects the corresponding diff. It produces an impact report before editing. Behavior, dependency, and preference changes require user approval.
 
+`scripts/update-context <Review-Cursor> <application>` is the read-only seam for this assessment. It emits only newly added change information for the selected Application Module and the relevant tracked diff through the reviewed target commit, including shared consumer-protocol files. It receives no Consumer Configuration path and performs no synchronization.
+
 ## Review architecture
 
 `REVIEW.md` is the single source of truth for deterministic checks, active Configuration Audits, and pull-request AI review. `AGENTS.md` exposes a direct instruction for invoking a full audit.

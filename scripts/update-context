@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""Build application-scoped upstream change context from a Review Cursor."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+ENTRY = re.compile(
+    r"^- \*\*(?P<application>[^*/]+?)(?: / (?P<category>[^*]+?))?\*\*: (?P<impact>.+)$"
+)
+SHARED_CONSUMER_PROTOCOL = (
+    "AGENTS.md",
+    "README.md",
+    "docs/architecture.md",
+    "scripts/update-context",
+)
+
+
+def git(root: Path, *arguments: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=check,
+    )
+
+
+def resolve_commit(root: Path, reference: str) -> str:
+    result = git(root, "rev-parse", "--verify", f"{reference}^{{commit}}", check=False)
+    if result.returncode:
+        raise ValueError(f"Review Cursor or target is not a commit: {reference}")
+    return result.stdout.strip()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Read application change information and tracked diff after a Review Cursor"
+    )
+    parser.add_argument("cursor", help="Previously reviewed release or commit")
+    parser.add_argument("application", help="Root-level Application Module name")
+    parser.add_argument("--to", default="HEAD", help="Upstream state to review (default: HEAD)")
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    arguments = parser.parse_args()
+    root = arguments.root.resolve()
+
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", arguments.application):
+        parser.error("application must be one root-level module name")
+
+    try:
+        cursor = resolve_commit(root, arguments.cursor)
+        target = resolve_commit(root, arguments.to)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    tracked = git(root, "ls-tree", "-r", "--name-only", target).stdout.splitlines()
+    modules = {
+        Path(path).parts[0]
+        for path in tracked
+        if len(Path(path).parts) == 2 and Path(path).name == "README.md"
+    }
+    module = next(
+        (candidate for candidate in modules if candidate.casefold() == arguments.application.casefold()),
+        None,
+    )
+    if module is None:
+        print(f"Application Module not found at target: {arguments.application}", file=sys.stderr)
+        return 2
+
+    changelog_diff = git(
+        root,
+        "diff",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--unified=0",
+        f"{cursor}..{target}",
+        "--",
+        "CHANGELOG.md",
+    ).stdout
+    entries: list[str] = []
+    for line in changelog_diff.splitlines():
+        if not line.startswith("+") or line.startswith("+++"):
+            continue
+        candidate = line[1:]
+        match = ENTRY.fullmatch(candidate)
+        if match and match.group("application").strip().casefold() == module.casefold():
+            if not match.group("category"):
+                print(f"{module.title()} change information is missing a category", file=sys.stderr)
+                return 1
+            entries.append(candidate)
+
+    module_diff = git(
+        root,
+        "diff",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--unified=3",
+        f"{cursor}..{target}",
+        "--",
+        module,
+        *SHARED_CONSUMER_PROTOCOL,
+    ).stdout
+    if module_diff and not entries:
+        print(
+            f"{module.title()} change information is required for changes after the Review Cursor",
+            file=sys.stderr,
+        )
+        return 1
+
+    print("=== REVIEW RANGE ===")
+    print(f"From: {cursor}")
+    print(f"To: {target}")
+    print(f"Application: {module}")
+    print(f"\n=== {module.upper()} CHANGE INFORMATION ===")
+    print("\n".join(entries) if entries else "No application change information in this range.")
+    print(f"\n=== {module.upper()} RELEVANT TRACKED DIFF ===")
+    print(module_diff, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

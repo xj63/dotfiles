@@ -20,6 +20,14 @@ I want help with: [goal]
 
 The first complete module is [Fish](fish/README.md). More applications can be added independently without requiring users or AI tools to inspect unrelated modules.
 
+## Reviewing newer Fish guidance
+
+Use this prompt after pulling a newer version of this repository:
+
+```text
+Review Fish changes after the Review Cursor in my current intent record. Follow AGENTS.md and fish/README.md, generate the Fish-only update context, and compare it with my current configuration and goals. Give me an impact report before proposing edits. Ask before behavior, dependency, or preference changes; if I decline, leave my configuration and cursor unchanged. If I accept selected changes, establish recovery, apply only those changes, validate, update my current intent, and advance the cursor to the reviewed upstream state.
+```
+
 ## Repository maintenance
 
 Repository changes follow [AGENTS.md](AGENTS.md) and the shared [Review Policy](REVIEW.md). Known secret and privacy patterns are checked locally at commit time and again in GitHub Actions. Semantic Configuration Audits run in the maintainer's existing local AI session and are recorded in the pull request.

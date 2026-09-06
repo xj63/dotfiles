@@ -33,6 +33,12 @@ When a user asks for help applying a module to their own configuration, complete
 
 Consumer Configurations remain independent from this repository. Never synchronize them automatically or inspect unrelated Application Modules. If intent cannot live in configuration comments or a Markdown file inside a directory-based configuration, ask before using ignored `.local/` state in the clone.
 
+### Upstream update assessment
+
+When a user asks about newer repository changes, read the Review Cursor from their intent record and the update instructions in the selected module. Generate the application-scoped change context, then compare each relevant upstream intent and diff with the current Consumer Configuration. The impact report is complete when every relevant change is classified as already satisfied, applicable, conflicting, or irrelevant to the user's goal.
+
+Present a focused impact report before proposing edits. A pull or a reviewed upstream change never authorizes configuration modification. Obtain confirmation for every behavior, dependency, or Maintainer Preference change. If the user declines the update, leave the Consumer Configuration and Review Cursor unchanged. If the user accepts a subset, establish recovery, apply only the accepted changes, validate, update current intent, and advance the Review Cursor to the reviewed upstream state.
+
 ### Review policy
 
 Before committing repository changes or auditing configuration safety, read `REVIEW.md`. Install the versioned commit hook with `scripts/install-hooks`; use `scripts/check all` for a full deterministic check.

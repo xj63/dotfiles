@@ -20,6 +20,8 @@ When changing the repository layout, application modules, consumer-AI workflow, 
 
 When adding or changing an Application Module, also read `docs/application-modules.md`. Complete the module when its native-root file layout, natural-language guidance, inline capability explanations, safe validation, and categorized `[Unreleased]` entry all pass `scripts/check all`.
 
+When preparing or publishing a Semantic Version checkpoint, follow `docs/releasing.md`; release preparation and the GitHub tag/Release are complete only when their version, commit, and semantic notes agree.
+
 ## Consumer configuration guidance
 
 When a user asks for help applying a module to their own configuration, complete these stages in order:

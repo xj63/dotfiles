@@ -22,8 +22,7 @@ It is not a dotfile installer, a home-directory mirror, or a synchronization ser
 │   ├── check
 │   └── install-hooks
 ├── .github/workflows/
-│   ├── checks.yml
-│   └── ai-review.yml
+│   └── checks.yml
 ├── docs/
 │   ├── adr/
 │   └── agents/
@@ -102,21 +101,21 @@ After pulling upstream, a user's AI reads changes after the Review Cursor, filte
 
 `REVIEW.md` is the single source of truth for deterministic checks, active Configuration Audits, and pull-request AI review. `AGENTS.md` exposes a direct instruction for invoking a full audit.
 
-The planned review pipeline is ordered:
+The review pipeline is ordered:
 
 1. `scripts/check` runs deterministic secret, privacy-pattern, path, syntax, and repository-policy checks.
 2. pre-commit invokes that same entry point against the staged change.
 3. CI invokes the same entry point as a required pull-request check.
-4. AI review runs only after deterministic CI succeeds. It receives tracked pull-request diff, `REVIEW.md`, and the minimum necessary module context.
-5. Blocking Findings fail the AI check. Advisory Findings become review comments and may be accepted with a recorded maintainer reason.
+4. Before creating or updating a pull request, the maintainer's local AI reviews the tracked diff, `REVIEW.md`, and the minimum necessary module context.
+5. Blocking Findings are remediated before merge. Advisory Findings are recorded in the pull request and may be accepted with a maintainer reason.
 
 The AI review context excludes `.local/`, Consumer Configurations, backups, unrelated filesystem content, and user environment data. Public identity is accepted only through an explicit allowlist.
 
-Scanner products and the AI provider remain replaceable behind stable repository entry points. Selecting them is an implementation decision; their behavior must satisfy `REVIEW.md`.
+Semantic review uses the maintainer's existing local AI session and requires no repository AI credential. GitHub CI remains deterministic, reproducible, and free of provider coupling.
 
 ## Branch and release contract
 
-All changes reach `main` through pull requests. Branch protection requires both deterministic and AI review checks. `main` remains readable and usable by a consumer AI, while GitHub Releases mark versioned review checkpoints.
+All changes reach `main` through pull requests. Branch protection requires the deterministic check; the local semantic audit is a maintainer workflow recorded in the pull request. `main` remains readable and usable by a consumer AI, while GitHub Releases mark versioned review checkpoints.
 
 ## Implementation sequence
 

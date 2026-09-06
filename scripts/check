@@ -78,16 +78,23 @@ def repository_content(root: Path, mode: str) -> list[tuple[str, bytes]]:
             )
         )
         return [
-            (path, b"" if is_local_state(path) else index_content(root, path))
+            (
+                path,
+                b"" if is_local_state(path) or is_backup_path(path) else index_content(root, path),
+            )
             for path in paths
         ]
 
+    tracked_paths = set(git_paths(root, "ls-files", "-z"))
     paths = git_paths(root, "ls-files", "--cached", "--others", "--exclude-standard", "-z")
     contents: list[tuple[str, bytes]] = []
     for path in paths:
         absolute_path = root / path
         if is_local_state(path):
             contents.append((path, b""))
+        elif is_backup_path(path):
+            if path in tracked_paths:
+                contents.append((path, b""))
         elif absolute_path.is_symlink():
             contents.append((path, os.readlink(absolute_path).encode("utf-8")))
         elif absolute_path.is_file():
@@ -97,6 +104,16 @@ def repository_content(root: Path, mode: str) -> list[tuple[str, bytes]]:
 
 def is_local_state(path: str) -> bool:
     return path == ".local" or path.startswith(".local/")
+
+
+def is_backup_path(path: str) -> bool:
+    name = Path(path).name
+    parts = Path(path).parts
+    return (
+        name.endswith(("~", ".bak", ".backup"))
+        or "backups" in parts
+        or ".backup" in parts
+    )
 
 
 def index_content(root: Path, path: str) -> bytes:
@@ -183,6 +200,14 @@ def main() -> int:
                 relative_path,
                 1,
                 "Local consumer state must remain ignored and untracked.",
+            ))
+            continue
+        if is_backup_path(relative_path):
+            findings.append(Finding(
+                "policy.tracked-backup",
+                relative_path,
+                1,
+                "Backup files must remain ignored and untracked.",
             ))
             continue
         try:

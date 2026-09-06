@@ -1,5 +1,6 @@
 ---
-status: accepted
+status: superseded
+superseded_by: 0004-local-semantic-review.md
 ---
 
 # Protect main with deterministic and semantic review

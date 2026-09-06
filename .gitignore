@@ -1,2 +1,7 @@
 /.local/
 __pycache__/
+*.bak
+*.backup
+*~
+backups/
+.backup/

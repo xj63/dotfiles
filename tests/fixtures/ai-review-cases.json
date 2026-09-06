@@ -1,0 +1,44 @@
+[
+  {
+    "id": "contextual-private-device",
+    "diff": "diff --git a/wezterm/wezterm.lua b/wezterm/wezterm.lua\n+++ b/wezterm/wezterm.lua\n@@ -0,0 +1 @@\n+config.default_prog = {'ssh', 'alex-bedroom-nas'}\n",
+    "module_context": [{"path": "wezterm/README.md", "content": "# WezTerm\n\nA reusable terminal configuration.\n"}],
+    "expected": [{"severity": "blocking", "path": "wezterm/wezterm.lua", "policy_rule_contains": "privacy", "evidence_contains": "alex-bedroom-nas", "disposition_any": ["placeholder", "remove", "redact"]}]
+  },
+  {
+    "id": "preference-presented-as-universal",
+    "diff": "diff --git a/fish/config.fish b/fish/config.fish\n+++ b/fish/config.fish\n@@ -0,0 +1,2 @@\n+# Autosuggestions are always distracting, so everyone should disable them.\n+set -g fish_autosuggestion_enabled 0\n",
+    "module_context": [{"path": "fish/README.md", "content": "# Fish\n"}],
+    "expected": [{"severity": "advisory", "path": "fish/config.fish", "policy_rule_contains": "preference", "evidence_contains": "always distracting", "disposition_any": ["preference", "qualify", "document"]}]
+  },
+  {
+    "id": "missing-prerequisite",
+    "diff": "diff --git a/fish/config.fish b/fish/config.fish\n+++ b/fish/config.fish\n@@ -0,0 +1 @@\n+fzf_configure_bindings --directory=\\cf\n",
+    "module_context": [{"path": "fish/README.md", "content": "# Fish\n\nNo prerequisites.\n"}],
+    "expected": [{"severity": "advisory", "path": "fish/config.fish", "policy_rule_contains": "prerequisite", "evidence_contains": "fzf_configure_bindings", "disposition_any": ["prerequisite", "install", "document"]}]
+  },
+  {
+    "id": "non-portable-assumption",
+    "diff": "diff --git a/zed/settings.json b/zed/settings.json\n+++ b/zed/settings.json\n@@ -1 +1 @@\n-{}\n+{\"terminal\": {\"shell\": {\"program\": \"/opt/homebrew/bin/fish\"}}}\n",
+    "module_context": [{"path": "zed/README.md", "content": "# Zed\n\nWorks on supported systems.\n"}],
+    "expected": [{"severity": "advisory", "path": "zed/settings.json", "policy_rule_contains": "portab", "evidence_contains": "/opt/homebrew/bin/fish", "disposition_any": ["detect", "substitute", "document", "portable"]}]
+  },
+  {
+    "id": "justified-platform-scope",
+    "diff": "diff --git a/zed/README.md b/zed/README.md\n+++ b/zed/README.md\n@@ -0,0 +1,4 @@\n+# Zed\n+\n+Tested on macOS with a Homebrew installation. The reference intentionally uses\n+the Homebrew prefix and users on other systems should substitute their detected path.\n",
+    "module_context": [{"path": "zed/README.md", "content": "# Zed\n\nTested on macOS with a Homebrew installation. The reference intentionally uses the Homebrew prefix and users on other systems should substitute their detected path.\n"}],
+    "expected": []
+  },
+  {
+    "id": "removed-private-content",
+    "diff": "diff --git a/wezterm/wezterm.lua b/wezterm/wezterm.lua\n--- a/wezterm/wezterm.lua\n+++ b/wezterm/wezterm.lua\n@@ -1 +1 @@\n-config.default_prog = {'ssh', 'alex-bedroom-nas'}\n+config.default_prog = {'ssh', 'host.example.com'}\n",
+    "module_context": [{"path": "wezterm/README.md", "content": "# WezTerm\n\nUse documented public placeholders.\n"}],
+    "expected": []
+  },
+  {
+    "id": "clean-portable-change",
+    "diff": "diff --git a/fish/config.fish b/fish/config.fish\n+++ b/fish/config.fish\n@@ -0,0 +1,2 @@\n+# Maintainer preference: keep the greeting quiet in interactive shells.\n+set -g fish_greeting\n",
+    "module_context": [{"path": "fish/README.md", "content": "# Fish\n\nTarget: the user's Fish configuration directory. Validate with `fish --no-execute config.fish`.\n"}],
+    "expected": []
+  }
+]

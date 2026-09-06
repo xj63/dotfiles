@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+import os
+import runpy
+import sys
+from pathlib import Path
+from typing import Any
+
+
+def matching_finding(expected: dict[str, str], review: dict[str, Any]) -> bool:
+    return any(
+        finding["path"] == expected["path"]
+        and expected["policy_rule_contains"].lower() in finding["policy_rule"].lower()
+        and expected["evidence_contains"].lower() in finding["evidence"].lower()
+        and any(
+            signal.lower() in finding["disposition"].lower()
+            for signal in expected["disposition_any"]
+        )
+        for finding in review[expected["severity"]]
+    )
+
+
+def main() -> int:
+    root = Path(__file__).resolve().parents[1]
+    implementation = runpy.run_path(str(root / "scripts" / "ai-review"))
+    cases = json.loads((root / "tests" / "fixtures" / "ai-review-cases.json").read_text())
+    policy = (root / "REVIEW.md").read_text()
+    failures: list[str] = []
+
+    for case in cases:
+        payload = {
+            "contract_version": implementation["CONTRACT_VERSION"],
+            "mode": "evaluation",
+            "policy": policy,
+            "diff": case["diff"],
+            "module_context": case["module_context"],
+        }
+        command = os.environ.get("AI_REVIEW_COMMAND")
+        try:
+            review = (
+                implementation["command_provider"](command, payload, root)
+                if command
+                else implementation["openai_provider"](payload)
+            )
+        except RuntimeError as error:
+            print(f"ERROR {case['id']}: {error}")
+            return 2
+
+        expected = case["expected"]
+        if not expected:
+            if review["blocking"] or review["advisory"]:
+                failures.append(f"{case['id']}: expected no findings")
+        else:
+            for finding in expected:
+                if not matching_finding(finding, review):
+                    failures.append(
+                        f"{case['id']}: missing {finding['severity']} finding for "
+                        f"{finding['path']} with policy containing "
+                        f"{finding['policy_rule_contains']!r}, correct evidence, and disposition"
+                    )
+        print(f"{'PASS' if not any(item.startswith(case['id'] + ':') for item in failures) else 'FAIL'} {case['id']}")
+
+    if failures:
+        print("\n".join(failures), file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -24,6 +24,7 @@ Local Consumer State, Consumer Configurations, backups, ignored files, unrelated
 | `privacy.device-identifier` | A MAC-address-shaped device identifier appears in public configuration. | Remove it or use a placeholder. |
 | `policy.identity-allowlist` | A Public Identity Exception lacks an exact value or reviewable reason. | Make the exception narrow and explain why it is public. |
 | `policy.local-consumer-state` | Content under the Local Consumer State boundary becomes tracked. | Remove it from Git and keep it ignored. |
+| `policy.tracked-backup` | A recognized backup path becomes tracked. Its contents are not read by the audit. | Remove it from Git and keep backups outside the repository or ignored. |
 | `syntax.json` | A JSON Reference Configuration cannot be parsed. | Correct the syntax before publishing it. |
 
 These rules are a high-confidence floor, not proof that content is safe. Semantic review covers contextual cases that patterns cannot decide.
@@ -52,7 +53,9 @@ AI review produces a finding only when it can cite affected diff content and exp
 - a user-affecting configuration, dependency, or protocol change without Upstream Change Information;
 - a module explanation that is technically present but not useful to a human reader or consumer AI.
 
-Advisories do not block by default. A maintainer who accepts one records a concrete reason in the pull request so later agents can distinguish a decision from an omission.
+Advisories are remediable or explicitly acceptable rather than unconditional merge blockers. A maintainer who accepts one records a concrete reason in the pull request so later agents can distinguish a decision from an omission.
+
+An unacknowledged Advisory Finding keeps the semantic status check failing. A maintainer may remediate it, or add one line to the pull-request description in the form `AI Review Advisory Reason: <concrete reason>`. Editing the description reruns the checks. The author must have the repository association `OWNER`, `MEMBER`, or `COLLABORATOR`; a reason never overrides a Blocking Finding.
 
 ## Finding format
 
@@ -64,6 +67,21 @@ BLOCKING [rule-id] path:line actionable explanation
 
 AI findings additionally include severity, evidence from the diff, consequence, and required remediation or maintainer decision.
 
+The semantic review contract is versioned independently of any provider. Each finding contains exactly:
+
+- `severity`: `blocking` or `advisory`;
+- `path` and an optional `line` identifying affected repository content;
+- `evidence` quoted or precisely paraphrased from the reviewed content;
+- `policy_rule` naming the applicable policy concern;
+- `consequence` explaining the user or publication impact;
+- `disposition` stating the required remediation or maintainer decision.
+
+`scripts/ai-review` is the stable entry point. It runs the deterministic audit before invoking a provider. Pull-request mode constructs its input from Git objects: the tracked diff, this policy at the reviewed commit, and only the README of each affected Application Module. Active-audit mode reads current tracked repository files without following symbolic links. Both modes exclude Local Consumer State and recognized backup paths.
+
+The default provider uses the OpenAI Responses API with response storage disabled and a strict output schema. `AI_REVIEW_COMMAND` may replace it with a command that accepts the versioned review request as JSON on standard input and returns the review result as JSON on standard output. Provider credentials are environment or CI secrets and never repository content.
+
+After changing a provider, model, prompt, or finding schema, run `scripts/evaluate-ai-review`. It exercises the review contract against versioned fixture diffs for contextual privacy, preference framing, prerequisites, portability, justified scope, and clean content. The evaluator tolerates wording variation but requires the expected severity, affected path, policy category, evidence, and disposition.
+
 ## Active audit
 
-Run the full deterministic portion with `scripts/check all`. When AI review is available, ask the repository agent to **audit the current repository using the Review Policy**; it must run deterministic checks first, then report Blocking and Advisory Findings separately.
+Ask the repository agent to **audit the current repository using the Review Policy**. The exact execution sequence is `scripts/check all` followed, only on success, by `scripts/ai-review audit`. The agent reports Blocking and Advisory Findings separately.

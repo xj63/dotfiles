@@ -2,6 +2,7 @@ name: Deterministic checks
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
   push:
     branches:
       - main
@@ -24,3 +25,77 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Check repository content
         run: scripts/check all
+
+  ai-review:
+    name: ai-review
+    if: github.event_name == 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Read recorded advisory acceptance
+        id: advisory
+        env:
+          PR_AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+
+          trusted = {"OWNER", "MEMBER", "COLLABORATOR"}
+          reason = ""
+          if os.environ.get("PR_AUTHOR_ASSOCIATION") in trusted:
+              match = re.search(
+                  r"(?im)^AI Review Advisory Reason:\s*(\S[^\r\n]*)$",
+                  os.environ.get("PR_BODY", ""),
+              )
+              if match:
+                  reason = match.group(1).strip()[:500]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"reason={reason}\n")
+          PY
+      - name: Run semantic Configuration Audit
+        id: audit
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AI_REVIEW_MODEL: ${{ vars.AI_REVIEW_MODEL || 'gpt-5.5' }}
+          AI_REVIEW_ADVISORY_REASON: ${{ steps.advisory.outputs.reason }}
+        run: |
+          set +e
+          scripts/ai-review pr \
+            --base "${{ github.event.pull_request.base.sha }}" \
+            --head "${{ github.event.pull_request.head.sha }}" \
+            > ai-review.md 2> ai-review-private.log
+          review_status=$?
+          set -e
+          if ! grep -q '^# Configuration Audit' ai-review.md; then
+            printf '%s\n' \
+              '# Configuration Audit' \
+              '' \
+              'The audit could not produce normalized findings. Private provider diagnostics were suppressed; inspect the workflow configuration and rerun.' \
+              > ai-review.md
+          fi
+          exit "$review_status"
+      - name: Publish audit report
+        if: always() && steps.audit.outcome != 'skipped'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat ai-review.md >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body-file ai-review.md --edit-last --create-if-none
+      - name: Enforce audit result
+        if: steps.audit.outcome == 'failure'
+        run: exit 1

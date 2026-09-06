@@ -20,10 +20,10 @@ It is not a dotfile installer, a home-directory mirror, or a synchronization ser
 │   └── pre-commit
 ├── scripts/
 │   ├── check
+│   ├── ai-review
 │   └── install-hooks
 ├── .github/workflows/
-│   ├── checks.yml
-│   └── ai-review.yml
+│   └── checks.yml
 ├── docs/
 │   ├── adr/
 │   └── agents/
@@ -102,7 +102,7 @@ After pulling upstream, a user's AI reads changes after the Review Cursor, filte
 
 `REVIEW.md` is the single source of truth for deterministic checks, active Configuration Audits, and pull-request AI review. `AGENTS.md` exposes a direct instruction for invoking a full audit.
 
-The planned review pipeline is ordered:
+The review pipeline is ordered:
 
 1. `scripts/check` runs deterministic secret, privacy-pattern, path, syntax, and repository-policy checks.
 2. pre-commit invokes that same entry point against the staged change.
@@ -112,7 +112,7 @@ The planned review pipeline is ordered:
 
 The AI review context excludes `.local/`, Consumer Configurations, backups, unrelated filesystem content, and user environment data. Public identity is accepted only through an explicit allowlist.
 
-Scanner products and the AI provider remain replaceable behind stable repository entry points. Selecting them is an implementation decision; their behavior must satisfy `REVIEW.md`.
+The semantic entry point exposes a versioned JSON contract. Its default OpenAI Responses adapter disables response storage and requests a strict schema; `AI_REVIEW_COMMAND` can replace the provider without changing policy, CI ordering, or finding semantics.
 
 ## Branch and release contract
 

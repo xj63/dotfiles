@@ -226,6 +226,36 @@ class RepositoryCheckTests(unittest.TestCase):
         self.assertIn("BLOCKING [policy.local-consumer-state]", result.stdout)
         self.assertNotIn("secret.github-token", result.stdout)
 
+    def test_staged_check_blocks_a_tracked_backup_without_reading_its_content(self) -> None:
+        token = "ghp_" + "abcdefghijklmnopqrstuvwxyz1234567890"
+        self.write("fish/config.fish.backup", f"Private backup value: {token}\n")
+        subprocess.run(
+            ["git", "add", "fish/config.fish.backup"],
+            cwd=self.repository,
+            check=True,
+        )
+
+        result = self.run_check("staged")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("BLOCKING [policy.tracked-backup]", result.stdout)
+        self.assertNotIn("secret.github-token", result.stdout)
+
+    def test_full_check_blocks_a_tracked_backup_without_reading_its_content(self) -> None:
+        token = "ghp_" + "abcdefghijklmnopqrstuvwxyz1234567890"
+        self.write("backups/config.fish", f"Private backup value: {token}\n")
+        subprocess.run(
+            ["git", "add", "backups/config.fish"],
+            cwd=self.repository,
+            check=True,
+        )
+
+        result = self.run_check("all")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("BLOCKING [policy.tracked-backup]", result.stdout)
+        self.assertNotIn("secret.github-token", result.stdout)
+
     def test_full_check_accepts_portable_placeholders_and_ignored_local_state(self) -> None:
         self.write(".gitignore", "/.local/\n")
         self.write("fish/README.md", "# Fish\n")

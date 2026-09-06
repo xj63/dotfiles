@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+"""Emit the bounded inputs for a local semantic Configuration Audit."""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+from pathlib import Path
+
+
+EXCLUDED_ROOTS = {"docs", "scripts", "tests"}
+
+
+def git(root: Path, *arguments: str) -> str:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Build the tracked, repository-only context for local AI review"
+    )
+    parser.add_argument("base", help="Base branch, tag, or commit for the pull-request diff")
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    arguments = parser.parse_args()
+    root = arguments.root.resolve()
+
+    check = Path(__file__).with_name("check")
+    checked = subprocess.run(
+        [str(check), "all", "--root", str(root)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if checked.returncode:
+        print(checked.stdout, end="")
+        return checked.returncode
+
+    changed = git(root, "diff", "--name-only", "--diff-filter=ACMR", f"{arguments.base}...HEAD").splitlines()
+    tracked = set(git(root, "ls-files").splitlines())
+    modules = sorted(
+        {
+            Path(path).parts[0]
+            for path in changed
+            if len(Path(path).parts) > 1
+            and not Path(path).parts[0].startswith(".")
+            and Path(path).parts[0] not in EXCLUDED_ROOTS
+            and f"{Path(path).parts[0]}/README.md" in tracked
+        }
+    )
+
+    print("=== REVIEW POLICY ===")
+    print(git(root, "show", "HEAD:REVIEW.md"), end="")
+    for module in modules:
+        print(f"\n=== MODULE CONTEXT: {module}/README.md ===")
+        print(git(root, "show", f"HEAD:{module}/README.md"), end="")
+    print(f"\n=== TRACKED DIFF: {arguments.base}...HEAD ===")
+    print(git(root, "diff", "--no-ext-diff", "--unified=3", f"{arguments.base}...HEAD"), end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,89 +1,110 @@
+// Zed parses this file as JSONC, so comments belong beside the choices they
+// explain. Official guide: https://zed.dev/docs/configuring-zed
 {
+  // Maintainer Preference: CLI and OS file-open requests create a new window
+  // instead of reusing the default existing window. File > Open is unaffected.
   "cli_default_open_behavior": "new_window",
-  "project_panel": {
-    "dock": "right"
-  },
-  "outline_panel": {
-    "dock": "right"
-  },
-  "collaboration_panel": {
-    "dock": "right"
-  },
+
+  // Maintainer Preference: show the Git panel as a hierarchical tree rather
+  // than its flat default. Dock locations are omitted because Zed's right-side
+  // defaults already match the desired layout.
   "git_panel": {
     "tree_view": true,
-    "dock": "right"
   },
+
+  // Optional capabilities: registry agents are installation entries, not
+  // credentials. Their model names/options depend on the installed agent and
+  // may become unavailable; never add authentication values to this file.
+  // https://zed.dev/docs/ai/external-agents
   "agent_servers": {
     "gemini": {
-      "type": "registry"
+      "type": "registry",
     },
     "codex-acp": {
       "default_config_options": {
-        "reasoning_effort": "high"
+        "reasoning_effort": "high",
       },
       "favorite_config_option_values": {
-        "model": [
-          "gpt-5.4"
-        ]
+        "model": ["gpt-5.4"],
       },
-      "type": "registry"
-    }
+      "type": "registry",
+    },
   },
-  "show_edit_predictions": true,
+
+  // Maintainer Preferences: extension-provided Catppuccin resources and a
+  // locally installed Monaspace font replace Zed's defaults. The default system
+  // mode still selects between these explicit light and dark choices.
   "icon_theme": "Catppuccin Mocha",
   "theme": {
-    "mode": "system",
     "light": "Catppuccin Latte (Blur)",
-    "dark": "Catppuccin Mocha (Blur)"
+    "dark": "Catppuccin Mocha (Blur)",
   },
   "buffer_font_family": "Monaspace Neon Frozen",
+
+  // Maintainer Preferences: require a modifier to send agent text and select
+  // environment-dependent Google models. The default left dock, write profile,
+  // and disabled thinking flag are intentionally inherited rather than repeated.
   "agent": {
-    "dock": "left",
     "use_modifier_to_send": true,
-    "default_profile": "write",
     "inline_assistant_model": {
       "provider": "google",
-      "model": "gemini-3.5-flash"
+      "model": "gemini-3.5-flash",
     },
     "default_model": {
-      "enable_thinking": false,
       "provider": "google",
-      "model": "gemini-3-flash-preview"
-    }
+      "model": "gemini-3-flash-preview",
+    },
   },
+
+  // Optional external service: Copilot edit predictions require account
+  // authentication and send editing context to that provider. Automatic display
+  // is Zed's default and is not repeated; provider "none" fully disables it.
+  // https://zed.dev/docs/ai/edit-prediction
   "edit_predictions": {
-    "provider": "copilot"
+    "provider": "copilot",
   },
+
+  // Maintainer Preferences: modal editing, wrapped relative numbers, automatic
+  // save when focus leaves a buffer, and visible code intelligence. Focus-change
+  // saves can trigger formatters/hooks; hints require language-server support.
   "vim_mode": true,
   "relative_line_numbers": "wrapped",
   "autosave": "on_focus_change",
   "minimap": {
-    "show": "auto"
+    "show": "auto",
   },
   "inlay_hints": {
-    "enabled": true
+    "enabled": true,
   },
   "diagnostics": {
     "inline": {
-      "enabled": true
-    }
+      "enabled": true,
+    },
   },
   "auto_signature_help": true,
+
+  // Maintainer Preference: treat Objective-C and Objective-C++ extensions as
+  // C++. Preserve a user's language-specific associations when they differ.
   "file_types": {
-    "C++": [
-      "mm",
-      "m"
-    ]
+    "C++": ["mm", "m"],
   },
+
+  // Optional third-party CargoTom extension setting. The gallery confirms the
+  // server name, but this initialization option is extension-version-specific;
+  // verify it against the installed extension rather than Zed core defaults.
+  // https://zed.dev/extensions/cargo-tom
   "lsp": {
     "cargo-tom": {
       "initialization_options": {
-        "hide_docs_info_message": true
-      }
-    }
+        "hide_docs_info_message": true,
+      },
+    },
   },
+
+  // Maintainer Preference: opt out of Zed's default diagnostic and metrics
+  // telemetry. This does not disable provider-specific data transmission.
   "telemetry": {
     "diagnostics": false,
-    "metrics": false
-  }
+    "metrics": false,
+  },
 }

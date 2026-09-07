@@ -6,6 +6,13 @@
   // instead of reusing the default existing window. File > Open is unaffected.
   "cli_default_open_behavior": "new_window",
 
+  // Maintainer Preferences: ask before Cmd-Q closes every workspace, and make
+  // an already-focused panel shortcut close that panel. These change Zed's
+  // immediate-quit and focus-only toggle defaults; quit confirmation can
+  // interrupt scripted exits, and repeated panel shortcuts now hide the panel.
+  "confirm_quit": true,
+  "close_panel_on_toggle": true,
+
   // Maintainer Preference: show the Git panel as a hierarchical tree rather
   // than its flat default. Dock locations are omitted because Zed's right-side
   // defaults already match the desired layout.
@@ -22,6 +29,17 @@
     "dark": "Catppuccin Mocha (Blur)",
   },
   "buffer_font_family": "Monaspace Neon Frozen",
+
+  // Maintainer Preferences: use smart-case search, keep the current code scope
+  // visible, and retain six context lines around keyboard navigation. These
+  // differ from fixed case-insensitive search, disabled editor sticky scroll,
+  // and a three-line margin. Sticky headers and the larger margin consume
+  // vertical space, especially in short panes.
+  "use_smartcase_search": true,
+  "sticky_scroll": {
+    "enabled": true,
+  },
+  "vertical_scroll_margin": 6,
 
   // Maintainer Preferences: modal editing, wrapped relative numbers, automatic
   // save when focus leaves a buffer, and visible code intelligence. Focus-change
@@ -46,6 +64,16 @@
   // C++. Preserve a user's language-specific associations when they differ.
   "file_types": {
     "C++": ["mm", "m"],
+  },
+
+  // Maintainer Preference: visually wrap Markdown at the editor width without
+  // inserting line breaks or changing code-file wrapping. This overrides the
+  // global no-wrap default only for Markdown and may hide very long source lines.
+  // https://zed.dev/docs/configuring-languages
+  "languages": {
+    "Markdown": {
+      "soft_wrap": "editor_width",
+    },
   },
 
   // Maintainer Preference for the optional third-party CargoTom extension:

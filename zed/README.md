@@ -2,7 +2,7 @@
 
 ## Purpose and environment
 
-This module is the maintainer's macOS-oriented Zed editor setup. It was validated with Zed 1.18.1 on macOS 26.6.2. It combines Vim-style editing, a tree-style Git panel, Catppuccin themes, Monaspace, visible code intelligence, and a double-Shift file finder.
+This module is the maintainer's macOS-oriented Zed editor setup. It was validated with Zed 1.18.1 on macOS 26.6.2. It combines Vim-style editing, safer application exit, efficient panel and search navigation, a tree-style Git panel, Catppuccin themes, Monaspace, visible code intelligence, Markdown wrapping, and a double-Shift file finder.
 
 ## Prerequisites and installation
 
@@ -16,13 +16,13 @@ The repository uses `settings.jsonc` and `keymap.jsonc` so GitHub and other tool
 
 ## Capabilities and maintainer preferences
 
-CLI requests open a new window, and the Git panel uses its non-default tree view. Zed's default panel docks are inherited rather than repeated. The editor follows the default system mode with explicit Catppuccin Blur themes, uses Monaspace, enables Vim mode, wrapped relative line numbers, focus-change autosave, automatic minimap visibility, inlay hints, inline diagnostics, and signature help. Objective-C extensions are associated with C++, telemetry diagnostics and metrics are disabled, and double Shift opens the file finder.
+CLI requests open a new window, quitting requires confirmation, a repeated focused-panel shortcut closes the panel, smart-case search follows uppercase queries, editor sticky scroll keeps the current scope visible, and keyboard navigation preserves six surrounding lines. The Git panel uses its non-default tree view, while Zed's default panel docks are inherited rather than repeated. The editor follows the default system mode with explicit Catppuccin Blur themes, uses Monaspace, enables Vim mode, wrapped relative line numbers, focus-change autosave, automatic minimap visibility, inlay hints, inline diagnostics, and signature help. Markdown wraps visually at the editor width without changing code wrapping or inserting line breaks. Objective-C extensions are associated with C++, telemetry diagnostics and metrics are disabled, and double Shift opens the file finder.
 
-All explicit values are Maintainer Preferences. Provider-specific agent, model, and edit-prediction selections are deliberately absent because they depend on user accounts, installed integrations, availability, and personal workflow. The default system theme mode and panel docks are omitted because they add no behavior. In particular, telemetry choices, focus-change autosave, and `shift shift` can materially change behavior.
+All explicit values are Maintainer Preferences. Provider-specific agent, model, and edit-prediction selections are deliberately absent because they depend on user accounts, installed integrations, availability, and personal workflow. The default system theme mode and panel docks are omitted because they add no behavior. In particular, quit confirmation, panel toggle semantics, sticky headers, a larger scroll margin, Markdown wrapping, telemetry choices, focus-change autosave, and `shift shift` can materially change behavior.
 
 ## Known conflicts
 
-Existing CLI open behavior, Git panel presentation, themes, icon themes, font selection, Vim mode, line numbers, autosave policy, minimap, hints, diagnostics, signature help, file associations, LSP initialization, telemetry, or double-Shift binding conflict directly. Focus-change autosave can run formatters or other save hooks. A missing theme, font, extension, or language server may cause Zed to reject or ignore only that setting. Preserve locally configured integrations, credentials, and endpoints outside the reference.
+Existing CLI open behavior, quit handling, panel shortcut expectations, search case rules, sticky scroll, scroll margins, Markdown language settings, Git panel presentation, themes, icon themes, font selection, Vim mode, line numbers, autosave policy, minimap, hints, diagnostics, signature help, file associations, LSP initialization, telemetry, or double-Shift binding conflict directly. Quit confirmation can interrupt automated exits; sticky headers and a six-line margin reduce usable height in short panes; Markdown visual wrapping can obscure long source lines. Focus-change autosave can run formatters or other save hooks. A missing theme, font, extension, or language server may cause Zed to reject or ignore only that setting. Preserve locally configured integrations, credentials, and endpoints outside the reference.
 
 ## Safe validation
 

@@ -6,7 +6,7 @@ This module is the maintainer's deliberately small LazyVim-based Neovim configur
 
 ## Prerequisites and installation
 
-Neovim, Git, and network access to GitHub are required for first-time bootstrap. Detect them with `command -v nvim`, `nvim --version`, and `command -v git`. Install Neovim from https://neovim.io/doc/user/ and review LazyVim's official installation guidance at https://www.lazyvim.org/installation. Language tooling such as Clangd and Rust Analyzer is optional until the matching language capability is used; LazyVim or Mason may offer to install additional tools.
+Neovim, Git, a C compiler for Tree-sitter, and network access to GitHub are required for first-time bootstrap; a Nerd Font is optional. Detect the commands and versions before proposing startup. Install Neovim from https://neovim.io/ and review LazyVim's official installation guidance at https://www.lazyvim.org/installation. The official lazy.nvim configuration reference is https://lazy.folke.io/configuration. Language tooling such as Clangd and Rust Analyzer is optional until the matching language capability is used; LazyVim or Mason may offer to install additional tools.
 
 Starting Neovim with this configuration can clone `lazy.nvim`, download plugins, update plugin metadata, and create files under Neovim's data and state directories. Explain these effects and obtain confirmation before the first launch. Do not infer permission to install language servers or formatters.
 
@@ -16,9 +16,9 @@ The module contents map to `$XDG_CONFIG_HOME/nvim`, falling back to `~/.config/n
 
 ## Capabilities and maintainer preferences
 
-`init.lua` delegates startup to `config.lazy`. The bootstrap loads LazyVim and local plugin specs, while `lazyvim.json` selects Clangd, Rust, and TOML extras. `lazy-lock.json` is a reproducibility checkpoint for the exact plugin revisions reviewed here.
+`init.lua` delegates startup to `config.lazy`, which is intentionally derived from the official LazyVim starter rather than copied without provenance. The bootstrap loads LazyVim and local plugin specs. `lazyvim.json` uses LazyVim configuration format 8 and selects the official [Clangd](https://www.lazyvim.org/extras/lang/clangd), [Rust](https://www.lazyvim.org/extras/lang/rust), and [TOML](https://www.lazyvim.org/extras/lang/toml) extras. Its `version` and `install_version` fields drive LazyVim migrations; generated NEWS read-state is deliberately excluded. `lazy-lock.json` is a comment-free reproducibility checkpoint for the exact plugin revisions reviewed here.
 
-LazyVim itself, the chosen language extras, automatic background update checks without notifications, disabled built-in runtime plugins, Catppuccin Mocha, and terminal-provided transparency are Maintainer Preferences. A user's AI should distinguish desired editing capabilities from the distribution and visual choices.
+LazyVim itself, the chosen language extras, current-commit rather than release-tag plugin resolution, automatic background update checks without notifications, disabled built-in runtime plugins, Catppuccin Mocha, and terminal-provided transparency are Maintainer Preferences. `defaults.lazy` is omitted because `false` is already lazy.nvim's default; StyLua's default 120-column width is also omitted. The two-space formatting settings remain because they differ from StyLua's tab/four-space defaults. A user's AI should distinguish desired editing capabilities from distribution, update, and visual choices.
 
 ## Known conflicts
 

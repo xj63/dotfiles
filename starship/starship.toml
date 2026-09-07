@@ -1,4 +1,7 @@
-# Maintainer Preference: keep identity, path, and the input marker on the left.
+# Maintainer Preference: this is derived from Starship's official Pure preset,
+# but moves contextual modules to the right and changes its symbols and colors.
+# Keep identity, path, and the input marker on the left.
+# Upstream preset: https://starship.rs/presets/pure-preset
 format = """
 $username\
 $hostname\
@@ -6,8 +9,10 @@ $directory\
 $character\
 """
 
-# Maintainer Preference: move contextual Git, timing, and Python information to
-# the right so the command entry area stays visually quiet.
+# Maintainer Preference: right_format is empty by default. Moving Git, timing,
+# and Python context right keeps command entry quiet, but narrow terminals may
+# hide or crowd it. Bash additionally requires Ble.sh 0.4+.
+# https://starship.rs/advanced-config/#enable-right-prompt
 right_format = """
 $git_branch\
 $git_state\
@@ -17,20 +22,27 @@ $python\
 """
 
 [directory]
+# Maintainer Preference: plain blue replaces Starship's bold cyan default.
 style = "blue"
 
 [character]
+# Maintainer Preference: distinct forward/backward arrows expose success, error,
+# and vi normal mode. Glyph appearance depends on the terminal font.
 success_symbol = "[❯](green)"
 error_symbol = "[❮](red)"
 vimcmd_symbol = "[|](purple)"
 
 [git_branch]
+# Maintainer Preference: show the raw branch name in dim text without the default
+# symbol or separating space. Long names consume right-prompt space.
 format = "[$branch]($style)"
 style = "bright-black"
 
 [git_status]
-# Maintainer Preference: zero-width markers preserve Starship's status grouping
-# while showing one compact aggregate instead of a different glyph per state.
+# Maintainer Preference: zero-width markers collapse conflict, untracked,
+# modified, staged, renamed, and deleted states into one `*` group. This loses
+# per-state counts/symbols and deliberately omits type-changed files.
+# Official variables: https://starship.rs/config/#git-status
 format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
 style = "cyan"
 conflicted = "​"
@@ -42,13 +54,22 @@ deleted = "​"
 stashed = "≡"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+# The upstream format is not repeated here; only the non-default dim style is an
+# intentional preference for rebase, merge, and bisect state.
 style = "bright-black"
 
 [cmd_duration]
+# Maintainer Preference: keep Starship's activation threshold but render elapsed
+# commands as plain yellow text without the default "took" prefix.
 format = "[$duration]($style) "
 style = "yellow"
 
 [python]
+# Maintainer Preference: show only the active virtual-environment name. Clearing
+# file/extension detection avoids version probing merely because Python files are
+# present; Starship still activates when a virtual environment exists.
+# https://starship.rs/config/#python
 format = "[$virtualenv]($style) "
 style = "bright-black"
+detect_extensions = []
+detect_files = []

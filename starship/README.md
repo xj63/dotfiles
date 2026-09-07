@@ -6,7 +6,7 @@ This module is the maintainer's compact two-sided Starship prompt. It was valida
 
 ## Prerequisites and installation
 
-Starship is required; detect it with `command -v starship` and inspect its version with `starship --version`. Use the official installation guide at https://starship.rs/guide/#step-1-install-starship only after the user approves. The prompt uses standard Unicode symbols and terminal colors but works best in a font that renders `❯`, `❮`, and `≡` clearly.
+Starship is required; detect it with `command -v starship` and inspect its version with `starship --version`. Use the official installation guide at https://starship.rs/guide/#step-1-install-starship only after the user approves. Read the official configuration and default-value reference at https://starship.rs/config/ before adapting a module. The prompt uses standard Unicode symbols and terminal colors but works best in a font that renders `❯`, `❮`, and `≡` clearly.
 
 A supported shell must initialize Starship separately. The Fish module in this repository conditionally runs `starship init fish`; other shells should follow Starship's official shell-specific setup. Do not add a second initialization when the user's shell already loads Starship.
 
@@ -16,13 +16,13 @@ The reference `starship.toml` maps to `$STARSHIP_CONFIG` when that variable is s
 
 ## Capabilities and maintainer preferences
 
-The left prompt shows user, host, directory, and a modal success/error character. The right prompt shows Git branch, operation state, a deliberately compact aggregate status, command duration, and the active Python virtual environment.
+The configuration is a documented derivative of Starship's official Pure preset, not a copy of the default prompt. The left prompt lists user, host, directory, and a modal success/error character. Username normally appears only for root, SSH, or a user unlike the login name, while hostname normally appears only over SSH; either can disclose runtime identity in recordings even though no identity is stored here. The right prompt shows Git branch, operation state, a deliberately compact aggregate status, command duration, and only the active Python virtual environment.
 
-The two-sided layout, module order, colors, arrow characters, vi-mode indicator, dim Git branch, compact status encoding, and omission of many Starship defaults are Maintainer Preferences. The zero-width Git state markers intentionally collapse several file states into one `*` group; users who need per-state counts or symbols should retain their existing status format.
+The two-sided layout, module order, colors, arrow characters, vi-mode indicator, dim Git branch/state, compact status encoding, and omission of many Starship defaults are Maintainer Preferences. The zero-width Git state markers intentionally collapse several file states into one `*` group and omit type-changed state; users who need per-state counts or symbols should retain their existing status format. `git_state.format` is omitted because the desired value is already Starship's default. Empty Python file/extension detectors are intentional non-default overrides that prevent project files alone from activating version detection.
 
 ## Known conflicts
 
-Existing `format`, `right_format`, module blocks, shell prompt functions, or another prompt framework conflict directly. A narrow terminal can cause the right prompt to disappear or reflow. The user/host modules still follow Starship's own visibility rules, so their presence in `format` does not guarantee they always render.
+Existing `format`, `right_format`, module blocks, shell prompt functions, or another prompt framework conflict directly. A narrow terminal can cause the right prompt to disappear or reflow; Bash requires Ble.sh 0.4 or newer for right-prompt support. The user/host modules still follow Starship's visibility rules, so their presence in `format` does not guarantee they render.
 
 ## Safe validation
 

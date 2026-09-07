@@ -10,7 +10,7 @@ The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax use
 
 ## Prerequisites and installation
 
-Fish is required. Detect it with `command -v fish` and inspect its version with `fish --version`. The official project and installation documentation are at https://fishshell.com/. Read the official configuration-file and startup-order reference at https://fishshell.com/docs/current/language.html#configuration-files before moving settings between `conf.d`, functions, and `config.fish`.
+Fish is required. Detect it with `command -v fish` and inspect its version with `fish --version`. Use Fish's official installation documentation at https://fishshell.com/docs/current/#installation. Read the official configuration-file and startup-order reference at https://fishshell.com/docs/current/language.html#configuration-files before moving settings between `conf.d`, functions, and `config.fish`.
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 

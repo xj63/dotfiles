@@ -15,13 +15,18 @@ if command --query nvim
 end
 
 if test -f "$HOME/.cargo/env.fish"
-    # Optional Rustup integration. This file is installation-owned; source it
-    # instead of copying its generated contents into the reference.
+    # Reusable Rule for an optional Rustup capability: source its
+    # installation-owned environment instead of copying generated contents.
+    # Choosing Rustup itself is a Maintainer Preference and may conflict with
+    # another Rust toolchain manager that also controls PATH.
     source "$HOME/.cargo/env.fish"
 end
 
-# Optional macOS Android Studio layout. Avoid pinning a local NDK or Build Tools
-# version; Android projects should select those versions themselves.
+# Maintainer Preference: use the standard macOS Android Studio SDK location.
+# This exports Android's legacy and current environment names and prepends its
+# emulator/platform tools, which can override another SDK manager's commands.
+# Reusable Rule: avoid pinning a local NDK or Build Tools version; Android
+# projects should select those versions themselves.
 if test -d "$HOME/Library/Android/sdk"
     set --global --export ANDROID_SDK_ROOT "$HOME/Library/Android/sdk"
     set --global --export ANDROID_HOME "$ANDROID_SDK_ROOT"

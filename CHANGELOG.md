@@ -4,6 +4,10 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Fish / configuration intent**: Restore intent, condition, dependency, conflict, privacy, and official-documentation comments throughout the reference; guard interactive integrations and theme state, use documented abbreviation syntax, and prevent file-owned paths from persisting as universal state. Existing consumers should review PATH precedence and custom key bindings before adopting the corrected behavior.
+
 ### Added
 
 - **Zed / module and preferences**: Add sanitized editor settings and a double-Shift file-finder keymap with Vim editing, Catppuccin/Monaspace presentation, panel layout, diagnostics, optional agent servers, and edit predictions. Existing users should review every preference and verify extensions, provider accounts, models, font/theme availability, autosave behavior, and key conflicts before adopting it; no conversations, credentials, private endpoints, or local agent instructions are included.

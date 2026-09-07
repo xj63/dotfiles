@@ -10,7 +10,7 @@ The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax use
 
 ## Prerequisites and installation
 
-Fish is required. Detect it with `command -v fish` and inspect its version with `fish --version`. The official project and installation documentation are at https://fishshell.com/.
+Fish is required. Detect it with `command -v fish` and inspect its version with `fish --version`. The official project and installation documentation are at https://fishshell.com/. Read the official configuration-file and startup-order reference at https://fishshell.com/docs/current/language.html#configuration-files before moving settings between `conf.d`, functions, and `config.fish`.
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 
@@ -33,7 +33,7 @@ Inspect the actual Fish configuration directory and existing file before proposi
 - `noproxy` clears common uppercase and lowercase proxy variables only for the current Fish process and its descendants; use it when a command must bypass a configured proxy.
 - When Git is already available, `gst` expands to `git status --short --branch`.
 
-The comments in `config.fish` identify the conditions and choices closest to the settings they describe.
+The comments throughout `config.fish`, `conf.d`, and `functions` identify the intent, conditions, conflicts, and subjective choices closest to the settings they describe. The palette is a pinned derivative of Fish 4.9.2's bundled Nord theme rather than Fish's default colors; its header records provenance and local differences.
 
 ## Maintainer Preferences
 

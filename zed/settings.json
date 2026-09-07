@@ -12,9 +12,10 @@
     "tree_view": true,
   },
 
-  // Optional capabilities: registry agents are installation entries, not
-  // credentials. Their model names/options depend on the installed agent and
-  // may become unavailable; never add authentication values to this file.
+  // Maintainer Preferences and optional capabilities: registry agents are
+  // installation entries, not credentials. Their model names/options depend on
+  // the installed agent and may become unavailable; never add authentication
+  // values to this file.
   // https://zed.dev/docs/ai/external-agents
   "agent_servers": {
     "gemini": {

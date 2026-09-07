@@ -38,6 +38,11 @@ PREREQUISITE_GUIDANCE = re.compile(
     r"(?i)\b(?:prerequisites?|required|requires|needs?|dependenc(?:y|ies)|must be installed)\b"
 )
 VALIDATION_GUIDANCE = re.compile(r"(?i)\b(?:validate|validation|check|test)\b")
+OFFICIAL_CONFIGURATION_GUIDANCE = re.compile(
+    r"(?is)(?:\bofficial\b.{0,160}\b(?:configur(?:ation|ing)?|settings?|reference|manual)\b|"
+    r"\b(?:configur(?:ation|ing)?|settings?|reference|manual)\b.{0,160}\bofficial\b)"
+)
+HTTPS_URL = re.compile(r"https://[^\s)>]+")
 
 
 @dataclass(frozen=True)
@@ -175,6 +180,69 @@ def application_modules(paths: list[str]) -> set[str]:
     }
 
 
+def jsonc_as_json(document: str) -> str:
+    """Remove JSONC comments and trailing commas while preserving line numbers."""
+    characters = list(document)
+    index = 0
+    in_string = False
+    escaped = False
+    while index < len(characters):
+        character = characters[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            index += 1
+            continue
+        if character == '"':
+            in_string = True
+            index += 1
+            continue
+        if character == "/" and index + 1 < len(characters):
+            following = characters[index + 1]
+            if following == "/":
+                while index < len(characters) and characters[index] != "\n":
+                    characters[index] = " "
+                    index += 1
+                continue
+            if following == "*":
+                end = document.find("*/", index + 2)
+                if end == -1:
+                    break
+                while index < end + 2:
+                    if characters[index] != "\n":
+                        characters[index] = " "
+                    index += 1
+                continue
+        index += 1
+
+    index = 0
+    in_string = False
+    escaped = False
+    while index < len(characters):
+        character = characters[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+        elif character == '"':
+            in_string = True
+        elif character == ",":
+            following = index + 1
+            while following < len(characters) and characters[following].isspace():
+                following += 1
+            if following < len(characters) and characters[following] in "]}":
+                characters[index] = " "
+        index += 1
+    return "".join(characters)
+
+
 def module_contract_findings(root: Path, mode: str) -> list[Finding]:
     paths = repository_paths(root, mode)
     modules = application_modules(paths)
@@ -210,6 +278,13 @@ def module_contract_findings(root: Path, mode: str) -> list[Finding]:
                 readme_path,
                 1,
                 "Module guidance must explain a safe validation method.",
+            ))
+        if not OFFICIAL_CONFIGURATION_GUIDANCE.search(readme) or not HTTPS_URL.search(readme):
+            findings.append(Finding(
+                "module.official-configuration-guidance",
+                readme_path,
+                1,
+                "Module guidance must link to official configuration documentation.",
             ))
         for path in paths:
             if not path.startswith(f"{module}/README.") or path == readme_path:
@@ -447,7 +522,7 @@ def main() -> int:
             relative_path,
         ):
             try:
-                json.loads(text)
+                json.loads(jsonc_as_json(text) if relative_path in {"zed/settings.json", "zed/keymap.json"} else text)
             except json.JSONDecodeError as error:
                 findings.append(Finding(
                     "syntax.json",

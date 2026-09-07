@@ -58,7 +58,9 @@ class FishRecoveryProtocolTests(unittest.TestCase):
                 repository,
                 "fish/README.md",
                 "fish-context-marker\n\nFish requires Fish. Place `config.fish` at "
-                "`$XDG_CONFIG_HOME/fish/config.fish` and validate with `fish --no-execute`.\n",
+                "`$XDG_CONFIG_HOME/fish/config.fish`. Read the official configuration reference at "
+                "https://fishshell.com/docs/current/language.html#configuration-files and validate "
+                "with `fish --no-execute`.\n",
             )
             self._write(repository, "fish/config.fish", "set fish_greeting\n")
             subprocess.run(["git", "add", "."], cwd=repository, check=True)
@@ -126,7 +128,9 @@ class FishRecoveryProtocolTests(unittest.TestCase):
                 repository,
                 "fish/README.md",
                 "fish module\n\nFish requires Fish. Place `config.fish` at "
-                "`$XDG_CONFIG_HOME/fish/config.fish` and validate with `fish --no-execute`.\n",
+                "`$XDG_CONFIG_HOME/fish/config.fish`. Read the official configuration reference at "
+                "https://fishshell.com/docs/current/language.html#configuration-files and validate "
+                "with `fish --no-execute`.\n",
             )
             self._write(repository, "fish/config.fish", "set fish_greeting\n")
             self._write(repository, ".gitattributes", "fish/config.fish diff=leaky\n")

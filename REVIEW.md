@@ -30,6 +30,7 @@ Local Consumer State, Consumer Configurations, backups, ignored files, unrelated
 | `module.target-guidance` | A discovered Application Module does not state a portable real target location. | Add natural-language placement guidance and a portable target path. |
 | `module.prerequisite-guidance` | A discovered module does not explain required prerequisites or dependencies. | State what is required, including when no external dependency is needed. |
 | `module.validation-guidance` | A discovered module does not explain safe validation. | Add the applicable read-only or side-effect-free validation method. |
+| `module.official-configuration-guidance` | A discovered module does not link to official configuration documentation. | Add a first-party configuration or settings reference and use it to assess defaults. |
 | `module.translation-source` | A translated module README does not point to the normative English README. | Link to `README.md` and state that English is normative. |
 | `module.change-information` | A user-affecting module edit lacks a categorized `[Unreleased]` entry. | Add application, category, impact, and migration guidance when relevant. |
 
@@ -54,6 +55,9 @@ AI review produces a finding only when it can cite affected diff content and exp
 ### Advisory
 
 - a Maintainer Preference presented as a Reusable Rule;
+- a supported comment format whose capability groups do not explain intent, effect, conditions, conflicts, and preference status close to the settings;
+- an explicit value that only repeats the applicable official default without a documented stability reason;
+- configuration guidance that cites a secondary/unrelated source as though it were the application's official reference;
 - platform, application-version, prerequisite, target-location, conflict, or validation context missing when the change needs it;
 - an absolute or environment-specific assumption that makes the Reference Configuration misleading;
 - a user-affecting configuration, dependency, or protocol change without Upstream Change Information;

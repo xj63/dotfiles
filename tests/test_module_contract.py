@@ -60,12 +60,26 @@ class ApplicationModuleContractTests(unittest.TestCase):
 
         self.assert_failure(result, "module.validation-guidance", "nova/README.md")
 
+    def test_reports_missing_official_configuration_guidance(self) -> None:
+        self.write_conforming_module()
+        self.write(
+            "nova/README.md",
+            "# Nova\n\nNova requires Nova 2; install it from the official Nova site. "
+            "Place `settings.toml` at `$XDG_CONFIG_HOME/nova/settings.toml`. "
+            "Validate safely with `nova --check settings.toml`.\n",
+        )
+
+        result = self.check("all")
+
+        self.assert_failure(result, "module.official-configuration-guidance", "nova/README.md")
+
     def test_accepts_clear_natural_language_synonyms(self) -> None:
         self.write_conforming_module()
         self.write(
             "nova/README.md",
             "# Nova\n\nNova 2 must be installed. Save `settings.toml` under "
-            "`$XDG_CONFIG_HOME/nova/`. Run `nova --check settings.toml` before use.\n",
+            "`$XDG_CONFIG_HOME/nova/`. The official configuration reference is "
+            "https://nova.example.com/settings. Run `nova --check settings.toml` before use.\n",
         )
 
         result = self.check("all")
@@ -288,6 +302,7 @@ class ApplicationModuleContractTests(unittest.TestCase):
             "Nova requires Nova 2; install it from the official Nova site. "
             "Place `settings.toml` at `$XDG_CONFIG_HOME/nova/settings.toml`. "
             "It enables focus mode as a Maintainer Preference. "
+            "Read the official configuration reference at https://nova.example.com/settings. "
             "Validate safely with `nova --check settings.toml`.\n",
         )
         self.write(

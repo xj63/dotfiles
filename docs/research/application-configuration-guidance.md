@@ -329,11 +329,6 @@ is freezing that default:
 
 - `project_panel.dock = "right"`, `outline_panel.dock = "right"`,
   `collaboration_panel.dock = "right"`, and `git_panel.dock = "right"`;
-- `agent.dock = "left"`;
-- `agent.default_profile = "write"`;
-- `agent.default_model.enable_thinking = false` (the selected provider/model
-  remain non-default);
-- `show_edit_predictions = true`;
 - `theme.mode = "system"` is the default mode, although keeping it beside the
   non-default light and dark Catppuccin choices makes the combined intent clear.
 
@@ -342,10 +337,10 @@ from `existing_window`; Git tree view differs from `false`; Catppuccin
 icon/themes and Monaspace differ from Zed defaults; Vim mode, wrapped relative
 numbers, focus-change autosave, minimap auto mode, inlay hints, inline
 diagnostics, and signature help all change their disabled/off defaults;
-telemetry changes both `true` defaults to `false`; the agent servers/models,
-Copilot provider, file association, and CargoTom initialization option are
-environment-dependent additions. Exact scalar defaults are also collected in
-the [All Settings reference](https://zed.dev/docs/reference/all-settings).
+telemetry changes both `true` defaults to `false`; the file association and
+CargoTom initialization option are environment-dependent additions. Exact
+scalar defaults are also collected in the
+[All Settings reference](https://zed.dev/docs/reference/all-settings).
 
 ### Conditions and conflicts requiring comments
 
@@ -358,16 +353,6 @@ the [All Settings reference](https://zed.dev/docs/reference/all-settings).
 - Inlay hints require support from each language server and may need additional
   server configuration
   ([inlay hints](https://zed.dev/docs/reference/all-settings#inlay-hints)).
-- Copilot edit predictions require account authentication and send editing
-  context to that provider. `show_edit_predictions` only controls automatic
-  display and does not disable requests/providers; setting the provider to
-  `none` is the complete disable switch
-  ([edit predictions](https://zed.dev/docs/ai/edit-prediction)).
-- Registry agent entries are installations/capabilities, while model IDs and
-  per-agent options are availability-dependent. External agents have their own
-  authentication and may read credentials through their own local or remote
-  setup; never place those credentials in the reference
-  ([external agents](https://zed.dev/docs/ai/external-agents)).
 - The CargoTom setting requires the third-party extension; its official Zed
   gallery page confirms the extension but does not document
   `hide_docs_info_message`, so the repository must describe that option as
@@ -399,5 +384,4 @@ for deterministic checking. In Zed, open Default Settings to compare inherited
 values, use the Settings Editor/schema diagnostics for unsupported fields, use
 the keymap editor and `dev: open key context view` for binding conflicts, and
 use `zed: open log` for extension/LSP diagnostics. Opening or reloading the app,
-installing extensions, signing in, or testing providers remains consequential
-and requires confirmation.
+installing extensions remains consequential and requires confirmation.

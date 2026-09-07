@@ -1,0 +1,99 @@
+# Reusable compatibility declaration: opt in to the newest configuration
+# semantics supported by AeroSpace 0.21.3-Beta. Omitting this key selects the
+# legacy version 1 behavior and produces a warning in current releases.
+# https://nikitabobko.github.io/AeroSpace/guide#config-version
+config-version = 2
+
+# Maintainer Preferences: register AeroSpace as a macOS login item, then begin
+# each new AeroSpace session on workspace 1. Starting at login changes session
+# startup behavior; omit the first line when launching manually, and omit the
+# callback when startup should preserve whichever workspace is already focused.
+# https://nikitabobko.github.io/AeroSpace/guide#after-startup-command
+start-at-login = true
+after-startup-command = ['workspace 1']
+
+# Maintainer Preference: prevent accidental Cmd-H from leaving an application
+# hidden outside AeroSpace's workspace model. This deliberately changes native
+# macOS Hide behavior and should be omitted by users who rely on Cmd-H.
+# https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
+automatically-unhide-macos-hidden-apps = true
+
+# Maintainer Preference: lazily move the pointer when window or workspace focus
+# changes, making keyboard-selected focus visible across monitors. This can be
+# distracting and can interact poorly with focus-follows-mouse, which remains at
+# its disabled default in this reference.
+# https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
+on-focus-changed = ['move-mouse window-lazy-center']
+
+# AeroSpace does not inherit bindings from its default configuration: this table
+# is the complete active main mode. These bindings are therefore explicit even
+# where they resemble the official sample. They use Option as a global modifier;
+# macOS text entry and tools such as Raycast, Karabiner-Elements, or skhd may
+# claim the same combinations first.
+# https://nikitabobko.github.io/AeroSpace/guide#binding-modes
+[mode.main.binding]
+
+# Maintainer Preference: Vim directions focus or move tiled windows. Floating
+# windows still participate in directional focus unless the command is changed
+# to use --ignore-floating.
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+# Maintainer Preferences: resize along the current container axis in 50-point
+# steps, toggle AeroSpace floating/fullscreen states, cycle tiled/accordion
+# layouts, and create nested containers toward the left or top. These replace
+# the official sample's Alt-Slash and Alt-Comma layout bindings.
+# https://nikitabobko.github.io/AeroSpace/commands#layout
+alt-minus = 'resize smart -50'
+alt-equal = 'resize smart +50'
+alt-f = 'layout floating tiling'
+alt-shift-f = 'fullscreen'
+alt-slash = 'layout accordion tiles'
+alt-comma = 'join-with left'
+alt-period = 'join-with up'
+
+# Maintainer Preference: use ten numeric workspaces. Alt-Tab walks workspace
+# order rather than toggling back to the previous workspace, while Page Up/Down
+# and Home/End provide explicit navigation alternatives.
+alt-tab = 'workspace next'
+alt-shift-tab = 'workspace prev'
+alt-0 = 'workspace 0'
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+alt-pageUp = 'workspace prev'
+alt-pageDown = 'workspace next'
+alt-home = 'workspace 1'
+alt-end = 'workspace 0'
+
+# Maintainer Preference: Shift moves the focused window to the matching or
+# adjacent workspace and keeps that window focused. This is more continuous than
+# AeroSpace's sample commands without --focus-follows-window, but it changes the
+# visible workspace as part of every move.
+# https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
+alt-shift-0 = 'move-node-to-workspace --focus-follows-window 0'
+alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1'
+alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2'
+alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3'
+alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4'
+alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5'
+alt-shift-6 = 'move-node-to-workspace --focus-follows-window 6'
+alt-shift-7 = 'move-node-to-workspace --focus-follows-window 7'
+alt-shift-8 = 'move-node-to-workspace --focus-follows-window 8'
+alt-shift-9 = 'move-node-to-workspace --focus-follows-window 9'
+alt-shift-pageUp = 'move-node-to-workspace --focus-follows-window prev'
+alt-shift-pageDown = 'move-node-to-workspace --focus-follows-window next'
+alt-shift-home = 'move-node-to-workspace --focus-follows-window 1'
+alt-shift-end = 'move-node-to-workspace --focus-follows-window 0'

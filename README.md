@@ -18,7 +18,7 @@ Present the smallest plan that satisfies my goal. Explain behavior changes, prer
 I want help with: [goal]
 ```
 
-Available Application Modules are [Fish](fish/README.md), [WezTerm](wezterm/README.md), [Neovim](nvim/README.md), [Starship](starship/README.md), and [Zed](zed/README.md). Select only the module relevant to the current goal; users and AI tools do not need to inspect the others.
+Available Application Modules are [AeroSpace](aerospace/README.md), [Fish](fish/README.md), [Neovim](nvim/README.md), [Starship](starship/README.md), [WezTerm](wezterm/README.md), and [Zed](zed/README.md). Select only the module relevant to the current goal; users and AI tools do not need to inspect the others.
 
 ## Reviewing newer Fish guidance
 

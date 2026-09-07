@@ -336,10 +336,13 @@ All other repository entries are effective choices: CLI `new_window` differs
 from `existing_window`; Git tree view differs from `false`; Catppuccin
 icon/themes and Monaspace differ from Zed defaults; Vim mode, wrapped relative
 numbers, focus-change autosave, minimap auto mode, inlay hints, inline
-diagnostics, and signature help all change their disabled/off defaults;
-telemetry changes both `true` defaults to `false`; the file association and
-CargoTom initialization option are environment-dependent additions. Exact
-scalar defaults are also collected in the
+diagnostics, and signature help all change their disabled/off defaults. Quit
+confirmation, close-panel-on-toggle, smart-case search, and editor sticky scroll
+change `false` defaults to `true`; the six-line vertical scroll margin changes
+the default `3`; and Markdown editor-width wrapping overrides the language
+default of no soft wrapping. Telemetry changes both `true` defaults to `false`;
+the file association and CargoTom initialization option are
+environment-dependent additions. Exact scalar defaults are also collected in the
 [All Settings reference](https://zed.dev/docs/reference/all-settings).
 
 ### Conditions and conflicts requiring comments
@@ -353,6 +356,16 @@ scalar defaults are also collected in the
 - Inlay hints require support from each language server and may need additional
   server configuration
   ([inlay hints](https://zed.dev/docs/reference/all-settings#inlay-hints)).
+- `confirm_quit = true` prevents accidental whole-application exit but adds an
+  interaction to deliberate or scripted quits. `close_panel_on_toggle = true`
+  turns a focused panel shortcut into a close action rather than only returning
+  focus to the editor.
+- Smart-case search treats uppercase queries as case-sensitive. Editor sticky
+  scroll and a larger vertical margin preserve navigation context but consume
+  additional height in short panes.
+- Markdown `soft_wrap = "editor_width"` is a visual language-specific override;
+  it neither inserts newlines nor changes wrapping for source-code languages
+  ([language-specific settings](https://zed.dev/docs/configuring-languages)).
 - The CargoTom setting requires the third-party extension; its official Zed
   gallery page confirms the extension but does not document
   `hide_docs_info_message`, so the repository must describe that option as

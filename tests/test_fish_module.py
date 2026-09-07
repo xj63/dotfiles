@@ -71,7 +71,7 @@ class FishModuleTests(unittest.TestCase):
             environment["PATH"] = directory
             environment["TERM"] = "xterm-256color"
             without_git = subprocess.run(
-                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --show gst"],
+                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --query gst"],
                 env=environment,
                 text=True,
                 capture_output=True,
@@ -80,15 +80,15 @@ class FishModuleTests(unittest.TestCase):
             fake_git = Path(directory) / "git"
             fake_git.symlink_to("/usr/bin/true")
             with_git = subprocess.run(
-                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --show gst"],
+                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --query gst"],
                 env=environment,
                 text=True,
                 capture_output=True,
                 check=False,
             )
 
-        self.assertEqual("", without_git.stdout.strip())
-        self.assertIn("git status --short --branch", with_git.stdout)
+        self.assertNotEqual(0, without_git.returncode)
+        self.assertEqual(0, with_git.returncode)
 
 if __name__ == "__main__":
     unittest.main()

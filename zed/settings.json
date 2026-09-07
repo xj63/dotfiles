@@ -1,0 +1,89 @@
+{
+  "cli_default_open_behavior": "new_window",
+  "project_panel": {
+    "dock": "right"
+  },
+  "outline_panel": {
+    "dock": "right"
+  },
+  "collaboration_panel": {
+    "dock": "right"
+  },
+  "git_panel": {
+    "tree_view": true,
+    "dock": "right"
+  },
+  "agent_servers": {
+    "gemini": {
+      "type": "registry"
+    },
+    "codex-acp": {
+      "default_config_options": {
+        "reasoning_effort": "high"
+      },
+      "favorite_config_option_values": {
+        "model": [
+          "gpt-5.4"
+        ]
+      },
+      "type": "registry"
+    }
+  },
+  "show_edit_predictions": true,
+  "icon_theme": "Catppuccin Mocha",
+  "theme": {
+    "mode": "system",
+    "light": "Catppuccin Latte (Blur)",
+    "dark": "Catppuccin Mocha (Blur)"
+  },
+  "buffer_font_family": "Monaspace Neon Frozen",
+  "agent": {
+    "dock": "left",
+    "use_modifier_to_send": true,
+    "default_profile": "write",
+    "inline_assistant_model": {
+      "provider": "google",
+      "model": "gemini-3.5-flash"
+    },
+    "default_model": {
+      "enable_thinking": false,
+      "provider": "google",
+      "model": "gemini-3-flash-preview"
+    }
+  },
+  "edit_predictions": {
+    "provider": "copilot"
+  },
+  "vim_mode": true,
+  "relative_line_numbers": "wrapped",
+  "autosave": "on_focus_change",
+  "minimap": {
+    "show": "auto"
+  },
+  "inlay_hints": {
+    "enabled": true
+  },
+  "diagnostics": {
+    "inline": {
+      "enabled": true
+    }
+  },
+  "auto_signature_help": true,
+  "file_types": {
+    "C++": [
+      "mm",
+      "m"
+    ]
+  },
+  "lsp": {
+    "cargo-tom": {
+      "initialization_options": {
+        "hide_docs_info_message": true
+      }
+    }
+  },
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  }
+}

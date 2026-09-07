@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This module is one coherent, deliberately small Fish Reference Configuration. A user's AI should select and adapt only the capabilities that serve the user's stated goal; it should not replace an existing configuration wholesale.
+This module is a coherent Fish setup derived from the maintainer's daily configuration. It covers environment discovery, optional tool integrations, an opinionated interactive theme, and small command helpers. A user's AI should select only the capabilities that serve the stated goal; it should not replace an existing configuration wholesale.
 
 ## Applicable environment
 
-The reference was validated with Fish 4.9.2 on macOS 26.6.2 and with the official Fish 4.9.2 standalone binary on Linux x86-64 in CI. It uses Fish built-ins and is expected to be portable across Fish 4.x environments, but other versions and operating systems must be inspected rather than assumed compatible.
+The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew, Android Studio, OrbStack, LM Studio, Antigravity, and `open` conventions are macOS-specific and optional.
 
 ## Prerequisites and installation
 
@@ -14,7 +14,7 @@ Fish is required. Detect it with `command -v fish` and inspect its version with 
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 
-Git is optional. Detect it with `command -v git`. The configuration adds the `gst` abbreviation only when Git already exists; the abbreviation is not a reason to install Git.
+Git, Neovim, Starship, FZF, Zoxide, Eza, Yazi, 7-Zip (`7zz`), uv, WezTerm, OrbStack, LM Studio, Antigravity, Android Studio, and its SDK are optional. The configuration detects startup integrations before loading them. Individual helper functions still report the missing command when invoked; never install an optional tool merely to satisfy this reference.
 
 ## Target configuration location
 
@@ -24,39 +24,44 @@ Inspect the actual Fish configuration directory and existing file before proposi
 
 ## Included capabilities
 
-- Interactive-only scoping prevents presentation preferences from affecting non-interactive Fish processes.
-- An empty `fish_greeting` starts interactive shells quietly.
+- Interactive-only scoping prevents editing preferences from affecting scripts.
+- Vi key bindings and a dynamic time-and-host greeting shape interactive use.
+- Nord-inspired colors style syntax highlighting and completion pages.
+- Existing Homebrew, Rust, Android, and selected application paths are discovered without fixed usernames or SDK component versions.
+- FZF, Starship, and Zoxide initialize only when installed.
+- Directory, Python, archive, Yazi, uv, and WezTerm helpers keep common commands short; `ls` falls back to the system command when Eza is absent.
+- `noproxy` clears common uppercase and lowercase proxy variables only for the current Fish process and its descendants; use it when a command must bypass a configured proxy.
 - When Git is already available, `gst` expands to `git status --short --branch`.
 
 The comments in `config.fish` identify the conditions and choices closest to the settings they describe.
 
 ## Maintainer Preferences
 
-The quiet greeting and `gst` abbreviation are subjective choices, not Reusable Rules. Present them separately and adopt either one only when it matches the user's intent.
+Vi bindings, the greeting, colors, Homebrew hint suppression, editor selection, `gst`, command wrappers, and optional application integrations are subjective choices, not Reusable Rules. Present them separately. The dependency guards, portable `$HOME` paths, and avoidance of pinned local SDK component versions are reusable safety rules.
 
 ## Known conflicts
 
-An existing `fish_greeting` customization conflicts with the quiet greeting. An existing abbreviation, alias, or function named `gst` conflicts with the reference abbreviation. Preserve the user's existing behavior unless they explicitly choose the reference behavior after seeing the impact.
+Existing key bindings, theme variables, `fish_greeting`, `EDITOR`/`VISUAL`, Android or Java environment variables, abbreviations, and functions with the same names conflict with this reference. The `ls` wrapper is especially consequential because it replaces a core command; preserve the system behavior unless the user wants icons and Git state from Eza. Running `noproxy` can break network access that depends on a proxy, so invoke it explicitly rather than at startup and do not use it while proxy variables contain state that must remain in the current shell.
 
-Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a value or abbreviation appears to come from elsewhere.
+Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a value appears to come from elsewhere. Do not import `fish_variables`, generated completion links, proxy endpoints, account helpers, or credentials from another machine.
 
 ## Safe validation
 
-Run syntax validation before loading the changed configuration:
+Run syntax validation on every changed Fish file before loading the configuration:
 
 ```sh
-fish --no-config --no-execute "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
+find "${XDG_CONFIG_HOME:-$HOME/.config}/fish" -name '*.fish' -type f -exec fish --no-config --no-execute '{}' \;
 ```
 
-This parses the file without executing its commands. If it fails, stop, show the diagnostic, and use the established Recovery Path. Starting or restarting an interactive shell can affect the user's session and requires confirmation.
+This parses the files without executing their commands. If it fails, stop, show the diagnostic, and use the established Recovery Path. Starting or restarting an interactive shell can affect the user's session and requires confirmation.
 
 ## Consumer AI workflow
 
 1. Understand the desired Fish behavior and unresolved choices.
-2. Inspect the operating system, Fish version, resolved configuration directory, existing `config.fish`, relevant `conf.d` files, and whether Git and conflicting names exist.
-3. Read this module and the capability comments in `config.fish`.
+2. Inspect the operating system, Fish version, resolved configuration directory, existing `config.fish`, `conf.d` and `functions` files, relevant optional tools, and conflicting names.
+3. Read this module and the capability comments in `config.fish`, `conf.d`, and `functions`.
 4. Present a minimal plan covering exact edits, behavior, conflicts, optional dependencies, recovery, and validation. Do not edit yet.
-5. Obtain confirmation for each behavior change. If Fish or Git is missing, do not install it unless the user separately approves an official source or their chosen package manager.
+5. Obtain confirmation for each behavior change. If Fish or an optional tool is missing, do not install it unless the user separately approves an official source or their chosen package manager.
 6. Establish a Recovery Path, then merge only the accepted capabilities and preserve unrelated settings. Inspect version control before editing. If the affected files are tracked and clean, record the current commit and an exact command such as `git restore --source=<checkpoint> -- <affected-path>`; if they already have changes, ask the user to commit them or approve another checkpoint rather than discarding them. If the target is not version-controlled, back up only the affected files, tell the user each exact backup path, and provide the exact command that would restore it. If the target does not exist yet, record that prior absence and explain that recovery removes the newly created file. Never apply any restoration without confirmation.
 7. Run the safe syntax validation above. On failure, stop and offer restoration; do not continue to shell restart or further changes.
 8. On success, update the user's existing intent document with the current goal, reasons for non-obvious choices, and the upstream release or commit reviewed. If no convention exists, prefer useful comments in `config.fish`; when comments are unsuitable, propose a Markdown document such as `AI-INTENT.md` inside the Fish configuration directory and ask before creating it. Use ignored `.local/` state in this clone only when intent cannot live beside the Consumer Configuration and the user approves that fallback.

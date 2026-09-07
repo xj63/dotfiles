@@ -4,6 +4,24 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ## [Unreleased]
 
+### Added
+
+- **Zed / module and preferences**: Add sanitized editor settings and a double-Shift file-finder keymap with Vim editing, Catppuccin/Monaspace presentation, panel layout, diagnostics, optional agent servers, and edit predictions. Existing users should review every preference and verify extensions, provider accounts, models, font/theme availability, autosave behavior, and key conflicts before adopting it; no conversations, credentials, private endpoints, or local agent instructions are included.
+- **Starship / module and preferences**: Add a sanitized two-sided prompt with compact Git state, command duration, and Python environment context. Existing users should review shell initialization, Unicode/font support, narrow-terminal behavior, and the intentionally collapsed Git status before adopting it.
+- **nvim / module and preferences**: Add a sanitized LazyVim 8 reference with C/C++, Rust, and TOML extras, locked plugin revisions, and a transparent Catppuccin theme. Existing users should not replace another plugin manager wholesale and must approve first-start network/bootstrap effects and any optional language-tool installation.
+- **WezTerm / module and preferences**: Add a sanitized cross-platform terminal reference with guarded window effects, Catppuccin styling, a Monaspace-first font fallback, and a hidden tab bar. Existing users should review visibility, navigation, font availability, compositor support, and platform-specific decoration effects before adopting it.
+
+### Changed
+
+- **repository / consumer protocol**: List every available Application Module in the human entry point so users and AI can select Fish, WezTerm, Neovim, Starship, or Zed without inspecting unrelated modules. Existing consumer configurations do not change.
+- **nvim / module guidance**: Remove empty user-extension placeholders and place update-checker and runtime-plugin preference explanations beside their settings. Existing runtime behavior does not change because the removed files contained no code.
+- **WezTerm / module guidance**: Explain the Linux/KDE blur and Windows backdrop conditions beside their settings. Existing WezTerm behavior does not change.
+- **Starship / module guidance**: Correctly label compact zero-width Git status markers as a Maintainer Preference rather than a reusable rule. Existing prompt behavior does not change.
+- **Zed / module guidance**: Remove inert empty proxy and context-server placeholders, then explain CLI window and Git tree behavior. Existing users with a proxy or context server should preserve their local value; other documented behavior is unchanged.
+- **Fish / capability guidance**: Explain when `noproxy` is useful and that it can break proxy-dependent network access. Existing Fish behavior does not change until the function is invoked.
+- **Fish / validation guidance**: Extend safe validation and inspection guidance to cover `config.fish`, `conf.d`, functions, and all optional tools. Existing Fish behavior does not change.
+- **Fish / behavior and preferences**: Expand the reference into the maintainer's sanitized daily setup with vi bindings, theme colors, guarded toolchain integrations, and command helpers. Existing consumers should review each optional dependency and name conflict before adopting anything; the former quiet greeting changes to an explicit dynamic greeting only when selected.
+
 ## [1.0.0] - 2026-09-07
 
 ### Added

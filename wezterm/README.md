@@ -2,7 +2,7 @@
 
 ## Purpose and environment
 
-This module is the maintainer's compact, cross-platform WezTerm appearance configuration. It was validated with WezTerm `20240203-110809-5046fc22` on macOS 26.6.2. Platform branches cover macOS, Linux/KDE, and Windows, but the visual result depends on the compositor and installed fonts.
+This module is the maintainer's compact, cross-platform WezTerm appearance configuration. It was validated with WezTerm `20240203-110809-5046fc22` on macOS 26.6.2. Platform branches cover macOS, Linux, and Windows, but the visual result depends on the compositor and installed fonts.
 
 ## Prerequisites and installation
 

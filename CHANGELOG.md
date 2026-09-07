@@ -6,6 +6,7 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Added
 
+- **nvim / module and preferences**: Add a sanitized LazyVim 8 reference with C/C++, Rust, and TOML extras, locked plugin revisions, and a transparent Catppuccin theme. Existing users should not replace another plugin manager wholesale and must approve first-start network/bootstrap effects and any optional language-tool installation.
 - **WezTerm / module and preferences**: Add a sanitized cross-platform terminal reference with guarded window effects, Catppuccin styling, a Monaspace-first font fallback, and a hidden tab bar. Existing users should review visibility, navigation, font availability, compositor support, and platform-specific decoration effects before adopting it.
 
 ### Changed

@@ -1,8 +1,13 @@
+// Zed keymaps are JSONC. Official syntax and precedence:
+// https://zed.dev/docs/key-bindings
 [
   {
+    // Maintainer Preference: double-tap Shift anywhere in the workspace to open
+    // the file finder. The action fires on modifier release and may conflict with
+    // an OS input method or another Workspace binding; later bindings win.
     "context": "Workspace",
     "bindings": {
-      "shift shift": "file_finder::Toggle"
-    }
-  }
+      "shift shift": "file_finder::Toggle",
+    },
+  },
 ]

@@ -196,12 +196,33 @@ class RepositoryCheckTests(unittest.TestCase):
 
     def test_full_check_blocks_invalid_json_configuration(self) -> None:
         self.write("zed/README.md", "# Zed\n")
-        self.write("zed/settings.json", '{"theme": "dark",}\n')
+        self.write("zed/settings.json", '{"theme": }\n')
 
         result = self.run_check("all")
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("BLOCKING [syntax.json] zed/settings.json:1", result.stdout)
+
+    def test_full_check_accepts_zed_jsonc_without_weakening_other_json(self) -> None:
+        self.write(
+            "zed/README.md",
+            "# Zed\n\nZed is required. Place `settings.json` at `$XDG_CONFIG_HOME/zed/settings.json`. "
+            "Read the official configuration reference at https://zed.dev/docs/configuring-zed. "
+            "Validate the JSONC settings before use.\n",
+        )
+        self.write(
+            "zed/settings.json",
+            '{\n  // Maintainer Preference with https://example.com in a string.\n'
+            '  "url": "https://example.com",\n  "vim_mode": true,\n}\n',
+        )
+        self.write("tool/README.md", "# Tool\n")
+        self.write("tool/settings.json", '{"strict": true,}\n')
+
+        result = self.run_check("all")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("syntax.json] zed/settings.json", result.stdout)
+        self.assertIn("syntax.json] tool/settings.json", result.stdout)
 
     def test_full_check_does_not_parse_json_outside_an_application_module(self) -> None:
         self.write("tests/README.md", "# Test fixtures\n")
@@ -261,7 +282,9 @@ class RepositoryCheckTests(unittest.TestCase):
         self.write(
             "fish/README.md",
             "# Fish\n\nFish requires Fish. Place `settings.json` at "
-            "`$XDG_CONFIG_HOME/fish/settings.json` and validate it with `fish --check`.\n",
+            "`$XDG_CONFIG_HOME/fish/settings.json`. Read the official configuration reference at "
+            "https://fishshell.com/docs/current/language.html#configuration-files and validate it "
+            "with `fish --check`.\n",
         )
         self.write(
             "fish/settings.json",

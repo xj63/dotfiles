@@ -1,3 +1,5 @@
+# Maintainer Preference: format Lua with two spaces instead of StyLua's default
+# tabs and width 4. The default 120-column limit is intentionally inherited.
+# Official defaults: https://github.com/JohnnyMorganz/StyLua#configuration
 indent_type = "Spaces"
 indent_width = 2
-column_width = 120

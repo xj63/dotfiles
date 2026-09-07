@@ -4,6 +4,15 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **nvim / configuration comments**: Explain the non-default two-space StyLua policy beside the TOML settings and document that the default column width is intentionally inherited. Formatting behavior is unchanged.
+- **Zed / configuration intent**: Restore JSONC comments with per-setting intent, default comparisons, extension/provider conditions, data-sharing implications, conflicts, maintainer-preference labels, and official references, including explicit classification of agent, Copilot, and CargoTom choices. Remove repeated panel, agent, thinking, edit-display, and theme-mode defaults; effective behavior remains the same while local defaults can evolve naturally.
+- **Starship / configuration intent**: Restore official Pure-preset provenance, default comparisons, right-prompt constraints, compact Git-status trade-offs, and runtime identity/privacy comments. Remove the redundant default Git-state format and make Python display activate only for a virtual environment; users who relied on project-file Python version detection should keep Starship's default detectors.
+- **nvim / configuration intent**: Restore official starter provenance, default comparisons, bootstrap effects, plugin-version intent, disabled runtime capabilities, and theme conflicts beside the Lua settings. Remove redundant lazy.nvim `defaults.lazy` and `defaults.version` values, the StyLua column-width default, and generated LazyVim NEWS state; the lock file remains the deliberate plugin reproducibility boundary, while existing users keep the same effective plugin-loading and formatting behavior and regain their own news cursor.
+- **WezTerm / configuration intent**: Restore default comparisons, intent, platform conditions, conflicts, and official-documentation comments; remove an unsupported deprecated KDE blur option, describe the remaining branch as generic Linux behavior, and make the Windows 11 backdrop effective with its required opacity. Linux users lose only the invalid blur request, while Windows users should review the newly effective transparent system material.
+- **Fish / configuration intent**: Restore intent, condition, dependency, conflict, privacy, maintainer-preference labels, and official-documentation comments throughout the reference; guard interactive integrations and theme state, use documented abbreviation syntax, and prevent file-owned paths from persisting as universal state. Rustup and Android integration comments now distinguish reusable guards from toolchain preferences. Existing consumers should review PATH precedence, project-managed JDK selection, optional application startup behavior, and custom key bindings before adopting the corrected behavior.
+
 ### Added
 
 - **Zed / module and preferences**: Add sanitized editor settings and a double-Shift file-finder keymap with Vim editing, Catppuccin/Monaspace presentation, panel layout, diagnostics, optional agent servers, and edit predictions. Existing users should review every preference and verify extensions, provider accounts, models, font/theme availability, autosave behavior, and key conflicts before adopting it; no conversations, credentials, private endpoints, or local agent instructions are included.
@@ -13,6 +22,7 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Changed
 
+- **repository / module authoring protocol**: Require official configuration references, preserve useful source comments, distinguish intent from syntax narration, and omit repeated upstream defaults unless a stability reason is documented. Existing modules have been reassessed against their tested application versions; future module authors receive a deterministic missing-guidance diagnostic and local semantic review handles source quality and default equivalence.
 - **repository / consumer protocol**: List every available Application Module in the human entry point so users and AI can select Fish, WezTerm, Neovim, Starship, or Zed without inspecting unrelated modules. Existing consumer configurations do not change.
 - **nvim / module guidance**: Remove empty user-extension placeholders and place update-checker and runtime-plugin preference explanations beside their settings. Existing runtime behavior does not change because the removed files contained no code.
 - **WezTerm / module guidance**: Explain the Linux/KDE blur and Windows backdrop conditions beside their settings. Existing WezTerm behavior does not change.

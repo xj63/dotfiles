@@ -1,7 +1,9 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
--- Reusable rule: bootstrap only the stable lazy.nvim branch and stop visibly if
--- cloning fails. First startup performs a network and filesystem mutation.
+-- Reusable rule: this follows the official LazyVim starter bootstrap: install
+-- only lazy.nvim's stable branch into Neovim's data directory, then stop visibly
+-- if cloning fails. First startup performs a network and filesystem mutation.
+-- Upstream reference: https://github.com/LazyVim/starter/blob/main/lua/config/lazy.lua
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local repository = "https://github.com/folke/lazy.nvim.git"
   local output = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", repository, lazypath })
@@ -18,17 +20,17 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- Inherited default: lazy.nvim resolves the current Git commit when a plugin
+-- spec has no version. Do not repeat `defaults.version = false`; the lock file
+-- already provides the reviewed reproducibility boundary until an update.
+-- https://lazy.folke.io/spec/versioning
 require("lazy").setup({
   spec = {
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     { import = "plugins" },
   },
-  defaults = {
-    -- Maintainer Preference: use exact commits from lazy-lock.json rather than
-    -- plugin release tags; update the lock file deliberately.
-    lazy = false,
-    version = false,
-  },
+  -- Maintainer Preference: try Catppuccin first during bootstrap and retain
+  -- Neovim's built-in habamax as a dependency-free recovery fallback.
   install = { colorscheme = { "catppuccin-mocha", "habamax" } },
   checker = {
     -- Maintainer Preference: check for available updates in the background but
@@ -39,8 +41,11 @@ require("lazy").setup({
   },
   performance = {
     rtp = {
-      -- Maintainer Preference: omit built-in archive, conversion, and tutorial
-      -- plugins that are unused here. Keep any item the user relies on.
+      -- Maintainer Preference: reduce runtime-path work by disabling unused
+      -- built-ins. Keep an entry when its lost capability matters:
+      -- gzip/tarPlugin/zipPlugin edit compressed archives, tohtml converts the
+      -- current buffer to HTML, and tutor provides :Tutor.
+      -- https://lazy.folke.io/configuration
       disabled_plugins = {
         "gzip",
         "tarPlugin",

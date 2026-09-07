@@ -61,5 +61,11 @@ class FishModuleTests(unittest.TestCase):
 
         self.assertEqual(0, result.returncode, result.stderr)
 
+    def test_theme_uses_fish_native_selection_without_generated_assignments(self) -> None:
+        theme = (REPOSITORY_ROOT / "fish" / "conf.d" / "theme.fish").read_text()
+
+        self.assertIn("fish_config theme choose Nord", theme)
+        self.assertNotRegex(theme, r"(?m)^\s*set\b.*\bfish_(?:pager_)?color_")
+
 if __name__ == "__main__":
     unittest.main()

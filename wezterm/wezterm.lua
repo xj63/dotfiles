@@ -22,9 +22,13 @@ if platform == "macos" then
   config.window_background_opacity = 0.8
   config.macos_window_background_blur = 50
 elseif platform == "linux" then
+  -- Linux/KDE preference: subtle transparency and compositor-provided blur.
+  -- Omit blur on other desktops or when it reduces readability/performance.
   config.window_background_opacity = 0.95
   config.kde_window_background_blur = true
 elseif platform == "windows" then
+  -- Windows preference: request the system tabbed backdrop when supported.
+  -- Remove it when the OS or graphics environment renders it poorly.
   config.win32_system_backdrop = "Tabbed"
 end
 

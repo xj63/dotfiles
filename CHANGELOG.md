@@ -14,6 +14,11 @@ All notable user-facing and repository-protocol changes are recorded here.
 ### Changed
 
 - **repository / consumer protocol**: List every available Application Module in the human entry point so users and AI can select Fish, WezTerm, Neovim, Starship, or Zed without inspecting unrelated modules. Existing consumer configurations do not change.
+- **nvim / module guidance**: Remove empty user-extension placeholders and place update-checker and runtime-plugin preference explanations beside their settings. Existing runtime behavior does not change because the removed files contained no code.
+- **WezTerm / module guidance**: Explain the Linux/KDE blur and Windows backdrop conditions beside their settings. Existing WezTerm behavior does not change.
+- **Starship / module guidance**: Correctly label compact zero-width Git status markers as a Maintainer Preference rather than a reusable rule. Existing prompt behavior does not change.
+- **Zed / module guidance**: Remove inert empty proxy and context-server placeholders, then explain CLI window and Git tree behavior. Existing users with a proxy or context server should preserve their local value; other documented behavior is unchanged.
+- **Fish / capability guidance**: Explain when `noproxy` is useful and that it can break proxy-dependent network access. Existing Fish behavior does not change until the function is invoked.
 - **Fish / validation guidance**: Extend safe validation and inspection guidance to cover `config.fish`, `conf.d`, functions, and all optional tools. Existing Fish behavior does not change.
 - **Fish / behavior and preferences**: Expand the reference into the maintainer's sanitized daily setup with vi bindings, theme colors, guarded toolchain integrations, and command helpers. Existing consumers should review each optional dependency and name conflict before adopting anything; the former quiet greeting changes to an explicit dynamic greeting only when selected.
 

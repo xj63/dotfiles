@@ -29,7 +29,7 @@ format = "[$branch]($style)"
 style = "bright-black"
 
 [git_status]
-# Reusable rule: the zero-width markers preserve Starship's status grouping
+# Maintainer Preference: zero-width markers preserve Starship's status grouping
 # while showing one compact aggregate instead of a different glyph per state.
 format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
 style = "cyan"

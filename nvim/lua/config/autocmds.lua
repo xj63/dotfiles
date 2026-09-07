@@ -1,1 +1,0 @@
--- Add user-specific autocommands here. LazyVim loads this module automatically.

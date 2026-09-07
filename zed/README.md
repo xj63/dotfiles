@@ -16,13 +16,13 @@ The reference files map to `$XDG_CONFIG_HOME/zed/settings.json` and `$XDG_CONFIG
 
 ## Capabilities and maintainer preferences
 
-The workspace panels dock on the right while the agent docks on the left. The editor follows the system light/dark mode with Catppuccin Blur themes, uses Monaspace, enables Vim mode, wrapped relative line numbers, focus-change autosave, automatic minimap visibility, inlay hints, inline diagnostics, signature help, and edit predictions. Objective-C extensions are associated with C++, telemetry diagnostics and metrics are disabled, and double Shift opens the file finder.
+CLI requests open a new window. The workspace panels dock on the right, the Git panel uses its tree view, and the agent docks on the left. The editor follows the system light/dark mode with Catppuccin Blur themes, uses Monaspace, enables Vim mode, wrapped relative line numbers, focus-change autosave, automatic minimap visibility, inlay hints, inline diagnostics, signature help, and edit predictions. Objective-C extensions are associated with C++, telemetry diagnostics and metrics are disabled, and double Shift opens the file finder.
 
 All of these are Maintainer Preferences. Agent provider/model names are examples of the maintainer's current selection, not universal recommendations and not promises that a model remains available. In particular, `reasoning_effort = high`, the default write profile, modifier-to-send, telemetry choices, focus-change autosave, panel placement, and `shift shift` binding can materially change behavior.
 
 ## Known conflicts
 
-Existing panel docks, themes, icon themes, font selection, Vim mode, line numbers, autosave policy, minimap, hints, diagnostics, signature help, file associations, LSP initialization, telemetry, agent providers/models, edit-prediction provider, or double-Shift binding conflict directly. A missing theme, font, extension, server, provider account, or model may cause Zed to reject or ignore only that setting. Preserve locally configured credentials and endpoints outside the reference.
+Existing CLI open behavior, panel docks or Git panel presentation, themes, icon themes, font selection, Vim mode, line numbers, autosave policy, minimap, hints, diagnostics, signature help, file associations, LSP initialization, telemetry, agent providers/models, edit-prediction provider, or double-Shift binding conflict directly. A missing theme, font, extension, server, provider account, or model may cause Zed to reject or ignore only that setting. Preserve locally configured proxy settings, credentials, and endpoints outside the reference.
 
 ## Safe validation
 

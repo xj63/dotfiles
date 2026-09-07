@@ -31,11 +31,16 @@ require("lazy").setup({
   },
   install = { colorscheme = { "catppuccin-mocha", "habamax" } },
   checker = {
+    -- Maintainer Preference: check for available updates in the background but
+    -- do not interrupt editing with notifications. Disable this for offline or
+    -- tightly controlled environments.
     enabled = true,
     notify = false,
   },
   performance = {
     rtp = {
+      -- Maintainer Preference: omit built-in archive, conversion, and tutorial
+      -- plugins that are unused here. Keep any item the user relies on.
       disabled_plugins = {
         "gzip",
         "tarPlugin",

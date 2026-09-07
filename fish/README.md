@@ -30,6 +30,7 @@ Inspect the actual Fish configuration directory and existing file before proposi
 - Existing Homebrew, Rust, Android, and selected application paths are discovered without fixed usernames or SDK component versions.
 - FZF, Starship, and Zoxide initialize only when installed.
 - Directory, Python, archive, Yazi, uv, and WezTerm helpers keep common commands short; `ls` falls back to the system command when Eza is absent.
+- `noproxy` clears common uppercase and lowercase proxy variables only for the current Fish process and its descendants; use it when a command must bypass a configured proxy.
 - When Git is already available, `gst` expands to `git status --short --branch`.
 
 The comments in `config.fish` identify the conditions and choices closest to the settings they describe.
@@ -40,7 +41,7 @@ Vi bindings, the greeting, colors, Homebrew hint suppression, editor selection, 
 
 ## Known conflicts
 
-Existing key bindings, theme variables, `fish_greeting`, `EDITOR`/`VISUAL`, Android or Java environment variables, abbreviations, and functions with the same names conflict with this reference. The `ls` wrapper is especially consequential because it replaces a core command; preserve the system behavior unless the user wants icons and Git state from Eza.
+Existing key bindings, theme variables, `fish_greeting`, `EDITOR`/`VISUAL`, Android or Java environment variables, abbreviations, and functions with the same names conflict with this reference. The `ls` wrapper is especially consequential because it replaces a core command; preserve the system behavior unless the user wants icons and Git state from Eza. Running `noproxy` can break network access that depends on a proxy, so invoke it explicitly rather than at startup and do not use it while proxy variables contain state that must remain in the current shell.
 
 Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a value appears to come from elsewhere. Do not import `fish_variables`, generated completion links, proxy endpoints, account helpers, or credentials from another machine.
 

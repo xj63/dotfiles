@@ -1,5 +1,4 @@
 {
-  "proxy": "",
   "cli_default_open_behavior": "new_window",
   "project_panel": {
     "dock": "right"
@@ -52,7 +51,6 @@
       "model": "gemini-3-flash-preview"
     }
   },
-  "context_servers": {},
   "edit_predictions": {
     "provider": "copilot"
   },

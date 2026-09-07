@@ -31,6 +31,10 @@ if test -d "$HOME/Library/Android/sdk"
 end
 
 if test -d "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+    # Maintainer Preference: use Android Studio's bundled JBR as the global Java
+    # runtime so Android tooling follows the IDE. This can override a JDK chosen
+    # by a project manager such as SDKMAN!, jenv, asdf, or mise; omit this block
+    # when a project or toolchain must control JAVA_HOME.
     set --global --export JAVA_HOME "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
     fish_add_path --global "$JAVA_HOME/bin"
 end

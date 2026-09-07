@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This module is a coherent Fish setup derived from the maintainer's daily configuration. It covers environment discovery, optional tool integrations, an opinionated interactive theme, and small command helpers. A user's AI should select only the capabilities that serve the stated goal; it should not replace an existing configuration wholesale.
+This module is a coherent Fish setup derived from the maintainer's daily configuration. It covers environment discovery, an opinionated interactive theme, and small command helpers. A user's AI should select only the capabilities that serve the stated goal; it should not replace an existing configuration wholesale.
 
 ## Applicable environment
 
-The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew, Android Studio, OrbStack, LM Studio, Antigravity, and `open` conventions are macOS-specific and optional.
+The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew, Android Studio, and `open` conventions are macOS-specific and optional.
 
 ## Prerequisites and installation
 
@@ -14,7 +14,7 @@ Fish is required. Detect it with `command -v fish` and inspect its version with 
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 
-Git, Neovim, Starship, FZF, Zoxide, Eza, Yazi, 7-Zip (`7zz`), uv, WezTerm, OrbStack, LM Studio, Antigravity, Android Studio, and its SDK are optional. The configuration detects startup integrations before loading them. Individual helper functions still report the missing command when invoked; never install an optional tool merely to satisfy this reference.
+Git, Neovim, Starship, FZF, Zoxide, Eza, Yazi, 7-Zip (`7zz`), uv, WezTerm, Android Studio, and its SDK are optional. The configuration detects startup integrations before loading them. Individual helper functions still report the missing command when invoked; never install an optional tool merely to satisfy this reference.
 
 ## Target configuration location
 
@@ -37,7 +37,7 @@ The comments throughout `config.fish`, `conf.d`, and `functions` identify the in
 
 ## Maintainer Preferences
 
-Vi bindings, the greeting, colors, Homebrew hint suppression, editor selection, `gst`, command wrappers, and optional application integrations are subjective choices, not Reusable Rules. Present them separately. The dependency guards, portable `$HOME` paths, and avoidance of pinned local SDK component versions are reusable safety rules.
+Vi bindings, the greeting, colors, Homebrew hint suppression, editor selection, `gst`, and command wrappers are subjective choices, not Reusable Rules. Present them separately. The dependency guards, portable `$HOME` paths, and avoidance of pinned local SDK component versions are reusable safety rules.
 
 ## Known conflicts
 

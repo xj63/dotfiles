@@ -15,15 +15,3 @@ if status is-interactive
         abbr --add gst 'git status --short --branch'
     end
 end
-
-# Maintainer Preferences: load optional application integrations only when their
-# local files exist. OrbStack supplies its shell integration; LM Studio exposes
-# its CLI; Antigravity exposes its bundled command-line tools. Sourcing OrbStack
-# may change shell startup behavior, while the two added bin directories can
-# take precedence over same-named commands already on PATH.
-# File-owned paths use global scope so removing these lines removes their effect
-# in the next Fish process instead of leaving universal fish_user_paths state.
-# Official behavior: https://fishshell.com/docs/current/cmds/fish_add_path.html
-test -f "$HOME/.orbstack/shell/init2.fish"; and source "$HOME/.orbstack/shell/init2.fish" 2>/dev/null
-test -d "$HOME/.lmstudio/bin"; and fish_add_path --global "$HOME/.lmstudio/bin"
-test -d "$HOME/.antigravity/antigravity/bin"; and fish_add_path --global "$HOME/.antigravity/antigravity/bin"

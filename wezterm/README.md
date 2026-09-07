@@ -6,7 +6,7 @@ This module is the maintainer's compact, cross-platform WezTerm appearance confi
 
 ## Prerequisites and installation
 
-WezTerm is required; detect it with `command -v wezterm` and inspect its version with `wezterm --version`. Install it from the official project at https://wezterm.org/installation.html only after the user approves. `Monaspace Neon Frozen` is an optional font preference; the configuration falls back to `Menlo` when it is unavailable. Catppuccin Mocha is a color scheme bundled with the tested WezTerm release.
+WezTerm is required; detect it with `command -v wezterm` and inspect its version with `wezterm --version`. Install it from the official project at https://wezterm.org/installation.html only after the user approves. Read the official configuration-file reference at https://wezterm.org/config/files.html and its linked per-option pages before adapting a setting. `Monaspace Neon Frozen` is an optional font preference; the configuration falls back to `Menlo` when it is unavailable. Catppuccin Mocha is bundled with the tested WezTerm release.
 
 ## Target configuration location
 
@@ -14,9 +14,9 @@ Place or merge `wezterm.lua` at `$XDG_CONFIG_HOME/wezterm/wezterm.lua`, falling 
 
 ## Capabilities and maintainer preferences
 
-The reusable part detects WezTerm's target triple before applying platform-specific window settings. Everything visible is a Maintainer Preference: Catppuccin Mocha, a 14-point Monaspace-first font stack, a hidden tab bar, macOS resize-only decorations with 80% opacity and strong blur, lighter Linux transparency with KDE blur, and the Windows tabbed system backdrop.
+The reusable part uses `config_builder` for unknown-key diagnostics and detects WezTerm's target triple before applying platform-specific window settings. Everything visible is a Maintainer Preference: Catppuccin Mocha, a 14-point Monaspace-first font stack, a hidden tab bar, macOS resize-only decorations with 80% opacity and strong blur, lighter Linux transparency, and the Windows 11 tabbed system backdrop with its required transparent background.
 
-Disabling the tab bar hides tab navigation and status information. Transparency and blur can reduce contrast or performance, and KDE blur requires compositor support. `window_decorations = "RESIZE"` removes the normal macOS title bar controls. Present these consequences separately before adopting them.
+Disabling the tab bar hides tab navigation and status information. Transparency and blur can reduce contrast or performance. Linux compositor results vary, and the Windows backdrop requires Windows 11 build 22621 or later. `window_decorations = "RESIZE"` removes the normal macOS title bar controls. Present these consequences separately before adopting them.
 
 ## Known conflicts
 
@@ -28,6 +28,7 @@ Run the following read-only command against the candidate file. It loads the con
 
 ```sh
 wezterm --config-file "${XDG_CONFIG_HOME:-$HOME/.config}/wezterm/wezterm.lua" show-keys --lua >/dev/null
+wezterm --config-file "${XDG_CONFIG_HOME:-$HOME/.config}/wezterm/wezterm.lua" ls-fonts >/dev/null
 ```
 
 Stop on any Lua or configuration diagnostic. Opening or reloading WezTerm changes the visible application state and requires confirmation.

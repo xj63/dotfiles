@@ -6,6 +6,7 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Fixed
 
+- **WezTerm / configuration intent**: Restore default comparisons, intent, platform conditions, conflicts, and official-documentation comments; remove an unsupported deprecated KDE blur option and make the Windows 11 backdrop effective with its required opacity. Linux users lose only the invalid blur request, while Windows users should review the newly effective transparent system material.
 - **Fish / configuration intent**: Restore intent, condition, dependency, conflict, privacy, and official-documentation comments throughout the reference; guard interactive integrations and theme state, use documented abbreviation syntax, and prevent file-owned paths from persisting as universal state. Existing consumers should review PATH precedence and custom key bindings before adopting the corrected behavior.
 
 ### Added

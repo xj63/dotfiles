@@ -516,13 +516,14 @@ def main() -> int:
             text = content.decode("utf-8")
         except UnicodeDecodeError:
             continue
-        if Path(relative_path).suffix == ".json" and is_application_configuration(
+        suffix = Path(relative_path).suffix
+        if suffix in {".json", ".jsonc"} and is_application_configuration(
             arguments.root,
             arguments.mode,
             relative_path,
         ):
             try:
-                json.loads(jsonc_as_json(text) if relative_path in {"zed/settings.json", "zed/keymap.json"} else text)
+                json.loads(jsonc_as_json(text) if suffix == ".jsonc" else text)
             except json.JSONDecodeError as error:
                 findings.append(Finding(
                     "syntax.json",

@@ -1,4 +1,6 @@
-// Zed keymaps are JSONC. Official syntax and precedence:
+// Repository reference: merge this JSONC content into Zed's keymap.json;
+// do not copy the .jsonc filename into the user configuration directory.
+// Official syntax and precedence:
 // https://zed.dev/docs/key-bindings
 [
   {

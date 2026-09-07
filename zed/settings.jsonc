@@ -13,26 +13,6 @@
     "tree_view": true,
   },
 
-  // Maintainer Preferences and optional capabilities: registry agents are
-  // installation entries, not credentials. Their model names/options depend on
-  // the installed agent and may become unavailable; never add authentication
-  // values to this file.
-  // https://zed.dev/docs/ai/external-agents
-  "agent_servers": {
-    "gemini": {
-      "type": "registry",
-    },
-    "codex-acp": {
-      "default_config_options": {
-        "reasoning_effort": "high",
-      },
-      "favorite_config_option_values": {
-        "model": ["gpt-5.4"],
-      },
-      "type": "registry",
-    },
-  },
-
   // Maintainer Preferences: extension-provided Catppuccin resources and a
   // locally installed Monaspace font replace Zed's defaults. The default system
   // mode still selects between these explicit light and dark choices.
@@ -42,30 +22,6 @@
     "dark": "Catppuccin Mocha (Blur)",
   },
   "buffer_font_family": "Monaspace Neon Frozen",
-
-  // Maintainer Preferences: require a modifier to send agent text and select
-  // environment-dependent Google models. The default left dock, write profile,
-  // and disabled thinking flag are intentionally inherited rather than repeated.
-  "agent": {
-    "use_modifier_to_send": true,
-    "inline_assistant_model": {
-      "provider": "google",
-      "model": "gemini-3.5-flash",
-    },
-    "default_model": {
-      "provider": "google",
-      "model": "gemini-3-flash-preview",
-    },
-  },
-
-  // Maintainer Preference and optional external service: Copilot edit
-  // predictions require account authentication and send editing context to that
-  // provider. Automatic display is Zed's default and is not repeated; provider
-  // "none" fully disables it.
-  // https://zed.dev/docs/ai/edit-prediction
-  "edit_predictions": {
-    "provider": "copilot",
-  },
 
   // Maintainer Preferences: modal editing, wrapped relative numbers, automatic
   // save when focus leaves a buffer, and visible code intelligence. Focus-change
@@ -106,7 +62,7 @@
   },
 
   // Maintainer Preference: opt out of Zed's default diagnostic and metrics
-  // telemetry. This does not disable provider-specific data transmission.
+  // telemetry. Third-party extensions may have independent telemetry controls.
   "telemetry": {
     "diagnostics": false,
     "metrics": false,

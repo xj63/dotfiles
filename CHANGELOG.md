@@ -16,6 +16,7 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Removed
 
+- **Fish / AI-authored shortcut**: Remove the `gst` Git-status abbreviation that originated in the initial AI example rather than the maintainer's configuration. Existing consumer configurations are not changed automatically; users who deliberately adopted the shortcut may keep it locally, while new consumers no longer receive an invented preference.
 - **Fish / machine-specific integrations**: Remove the OrbStack startup script and LM Studio and Antigravity PATH additions from the general reference. Existing consumer configurations are not changed automatically; users who intentionally rely on these applications may retain their own local integration rather than inherit a maintainer-specific choice.
 - **Zed / provider-specific preferences**: Remove registry agent installations, selected Google agent models/options, and the Copilot edit-prediction provider from the general reference. Existing consumer configurations are not changed automatically; users who intentionally use these services may retain their own settings, while new consumers should choose integrations from their installed tools and account preferences rather than inherit the maintainer's providers.
 

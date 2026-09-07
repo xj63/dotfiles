@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
-import tempfile
 import unittest
 from pathlib import Path
 
@@ -62,33 +60,6 @@ class FishModuleTests(unittest.TestCase):
         )
 
         self.assertEqual(0, result.returncode, result.stderr)
-
-    @unittest.skipUnless(FISH, "Fish is required for executable module validation")
-    def test_optional_git_capability_is_conditioned_on_the_dependency(self) -> None:
-        configuration = REPOSITORY_ROOT / "fish" / "config.fish"
-        with tempfile.TemporaryDirectory() as directory:
-            environment = os.environ.copy()
-            environment["PATH"] = directory
-            environment["TERM"] = "xterm-256color"
-            without_git = subprocess.run(
-                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --query gst"],
-                env=environment,
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-            fake_git = Path(directory) / "git"
-            fake_git.symlink_to("/usr/bin/true")
-            with_git = subprocess.run(
-                [FISH, "--no-config", "--interactive", "--command", f"source {configuration}; abbr --query gst"],
-                env=environment,
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-
-        self.assertNotEqual(0, without_git.returncode)
-        self.assertEqual(0, with_git.returncode)
 
 if __name__ == "__main__":
     unittest.main()

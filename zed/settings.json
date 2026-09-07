@@ -57,9 +57,10 @@
     },
   },
 
-  // Optional external service: Copilot edit predictions require account
-  // authentication and send editing context to that provider. Automatic display
-  // is Zed's default and is not repeated; provider "none" fully disables it.
+  // Maintainer Preference and optional external service: Copilot edit
+  // predictions require account authentication and send editing context to that
+  // provider. Automatic display is Zed's default and is not repeated; provider
+  // "none" fully disables it.
   // https://zed.dev/docs/ai/edit-prediction
   "edit_predictions": {
     "provider": "copilot",
@@ -90,9 +91,10 @@
     "C++": ["mm", "m"],
   },
 
-  // Optional third-party CargoTom extension setting. The gallery confirms the
-  // server name, but this initialization option is extension-version-specific;
-  // verify it against the installed extension rather than Zed core defaults.
+  // Maintainer Preference for the optional third-party CargoTom extension:
+  // suppress its documentation notice. The gallery confirms the server name,
+  // but this initialization option is extension-version-specific; verify it
+  // against the installed extension rather than Zed core defaults.
   // https://zed.dev/extensions/cargo-tom
   "lsp": {
     "cargo-tom": {

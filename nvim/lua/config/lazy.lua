@@ -20,17 +20,14 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- Inherited default: lazy.nvim resolves the current Git commit when a plugin
+-- spec has no version. Do not repeat `defaults.version = false`; the lock file
+-- already provides the reviewed reproducibility boundary until an update.
+-- https://lazy.folke.io/spec/versioning
 require("lazy").setup({
   spec = {
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     { import = "plugins" },
-  },
-  defaults = {
-    -- Maintainer Preference: follow the LazyVim starter recommendation to use
-    -- current Git commits instead of often-stale plugin release tags. The lock
-    -- file still pins resolved commits until the user deliberately updates it.
-    -- https://lazy.folke.io/spec/versioning
-    version = false,
   },
   -- Maintainer Preference: try Catppuccin first during bootstrap and retain
   -- Neovim's built-in habamax as a dependency-free recovery fallback.

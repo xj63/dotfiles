@@ -87,18 +87,17 @@ system binaries ([Fish `fish_add_path`](https://fishshell.com/docs/current/cmds/
   optional and what failure to expect
   ([Fish autoloading functions](https://fishshell.com/docs/current/tutorial.html#autoloading-functions),
   [Fish `function`](https://fishshell.com/docs/current/cmds/function.html)).
-- `conf.d/theme.fish` is not Fish's default theme; it closely mirrors Fish's
-  bundled Nord theme. The provenance should be stated explicitly. Compared with
-  the official 4.9.2 Nord file, this copy adds `fish_color_match`, uses `normal`
-  instead of `--reset` for `fish_color_normal`, changes pager-prefix foreground,
-  and omits some bold attributes. Each deviation should either be intentional
-  and explained or aligned with upstream
-  ([Fish 4.9.2 Nord theme source](https://github.com/fish-shell/fish-shell/blob/4.9.2/share/themes/nord.theme),
-  [syntax-highlighting variables](https://fishshell.com/docs/current/interactive.html#syntax-highlighting-variables)).
+- `conf.d/theme.fish` selects Fish's bundled Nord theme rather than checking in
+  the generated expansion of its color variables. `fish_config theme choose`
+  loads the named theme into the current session, so the palette can track the
+  installed Fish version. This is a visible Maintainer Preference and overrides
+  a theme selected earlier in startup
+  ([Fish `fish_config`](https://fishshell.com/docs/current/cmds/fish_config.html),
+  [Fish 4.9.2 Nord theme source](https://github.com/fish-shell/fish-shell/blob/4.9.2/share/themes/nord.theme)).
 
 No ordinary Fish default is redundantly reasserted by the intended settings;
 the important changes are invalid syntax, missing interactive guards, implicit
-persistent path scope, and undocumented derivation from the bundled Nord theme.
+persistent path scope, and an expanded snapshot of the bundled Nord theme.
 
 ### Installation, inspection, and validation
 

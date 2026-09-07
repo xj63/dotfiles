@@ -26,13 +26,13 @@ Inspect the actual Fish configuration directory and existing file before proposi
 
 - Interactive-only scoping prevents editing preferences from affecting scripts.
 - Vi key bindings and a dynamic time-and-host greeting shape interactive use.
-- Nord-inspired colors style syntax highlighting and completion pages.
+- Fish's bundled Nord theme styles syntax highlighting and completion pages without committing generated color-variable output.
 - Existing Homebrew, Rust, Android, and selected application paths are discovered without fixed usernames or SDK component versions.
 - FZF, Starship, and Zoxide initialize only when installed.
 - Directory, Python, archive, Yazi, uv, and WezTerm helpers keep common commands short; `ls` falls back to the system command when Eza is absent.
 - `noproxy` clears common uppercase and lowercase proxy variables only for the current Fish process and its descendants; use it when a command must bypass a configured proxy.
 
-The comments throughout `config.fish`, `conf.d`, and `functions` identify the intent, conditions, conflicts, and subjective choices closest to the settings they describe. The palette is a pinned derivative of Fish 4.9.2's bundled Nord theme rather than Fish's default colors; its header records provenance and local differences.
+The comments throughout `config.fish`, `conf.d`, and `functions` identify the intent, conditions, conflicts, and subjective choices closest to the settings they describe. The Nord selection is intentionally not a frozen palette: `fish_config theme choose Nord` loads the theme bundled with the installed Fish version, so upstream color changes may appear after a Fish upgrade.
 
 ## Maintainer Preferences
 

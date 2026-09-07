@@ -4,6 +4,10 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Fish / behavior and preferences**: Expand the reference into the maintainer's sanitized daily setup with vi bindings, theme colors, guarded toolchain integrations, and command helpers. Existing consumers should review each optional dependency and name conflict before adopting anything; the former quiet greeting changes to an explicit dynamic greeting only when selected.
+
 ## [1.0.0] - 2026-09-07
 
 ### Added

@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This module is one coherent, deliberately small Fish Reference Configuration. A user's AI should select and adapt only the capabilities that serve the user's stated goal; it should not replace an existing configuration wholesale.
+This module is a coherent Fish setup derived from the maintainer's daily configuration. It covers environment discovery, optional tool integrations, an opinionated interactive theme, and small command helpers. A user's AI should select only the capabilities that serve the stated goal; it should not replace an existing configuration wholesale.
 
 ## Applicable environment
 
-The reference was validated with Fish 4.9.2 on macOS 26.6.2 and with the official Fish 4.9.2 standalone binary on Linux x86-64 in CI. It uses Fish built-ins and is expected to be portable across Fish 4.x environments, but other versions and operating systems must be inspected rather than assumed compatible.
+The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew, Android Studio, OrbStack, LM Studio, Antigravity, and `open` conventions are macOS-specific and optional.
 
 ## Prerequisites and installation
 
@@ -14,7 +14,7 @@ Fish is required. Detect it with `command -v fish` and inspect its version with 
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 
-Git is optional. Detect it with `command -v git`. The configuration adds the `gst` abbreviation only when Git already exists; the abbreviation is not a reason to install Git.
+Git, Neovim, Starship, FZF, Zoxide, Eza, Yazi, 7-Zip (`7zz`), uv, WezTerm, OrbStack, LM Studio, Antigravity, Android Studio, and its SDK are optional. The configuration detects startup integrations before loading them. Individual helper functions still report the missing command when invoked; never install an optional tool merely to satisfy this reference.
 
 ## Target configuration location
 
@@ -24,21 +24,25 @@ Inspect the actual Fish configuration directory and existing file before proposi
 
 ## Included capabilities
 
-- Interactive-only scoping prevents presentation preferences from affecting non-interactive Fish processes.
-- An empty `fish_greeting` starts interactive shells quietly.
+- Interactive-only scoping prevents editing preferences from affecting scripts.
+- Vi key bindings and a dynamic time-and-host greeting shape interactive use.
+- Nord-inspired colors style syntax highlighting and completion pages.
+- Existing Homebrew, Rust, Android, and selected application paths are discovered without fixed usernames or SDK component versions.
+- FZF, Starship, and Zoxide initialize only when installed.
+- Directory, Python, archive, Yazi, uv, and WezTerm helpers keep common commands short; `ls` falls back to the system command when Eza is absent.
 - When Git is already available, `gst` expands to `git status --short --branch`.
 
 The comments in `config.fish` identify the conditions and choices closest to the settings they describe.
 
 ## Maintainer Preferences
 
-The quiet greeting and `gst` abbreviation are subjective choices, not Reusable Rules. Present them separately and adopt either one only when it matches the user's intent.
+Vi bindings, the greeting, colors, Homebrew hint suppression, editor selection, `gst`, command wrappers, and optional application integrations are subjective choices, not Reusable Rules. Present them separately. The dependency guards, portable `$HOME` paths, and avoidance of pinned local SDK component versions are reusable safety rules.
 
 ## Known conflicts
 
-An existing `fish_greeting` customization conflicts with the quiet greeting. An existing abbreviation, alias, or function named `gst` conflicts with the reference abbreviation. Preserve the user's existing behavior unless they explicitly choose the reference behavior after seeing the impact.
+Existing key bindings, theme variables, `fish_greeting`, `EDITOR`/`VISUAL`, Android or Java environment variables, abbreviations, and functions with the same names conflict with this reference. The `ls` wrapper is especially consequential because it replaces a core command; preserve the system behavior unless the user wants icons and Git state from Eza.
 
-Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a value or abbreviation appears to come from elsewhere.
+Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a value appears to come from elsewhere. Do not import `fish_variables`, generated completion links, proxy endpoints, account helpers, or credentials from another machine.
 
 ## Safe validation
 

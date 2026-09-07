@@ -22,6 +22,7 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Changed
 
+- **Zed / reference filenames**: Rename the commented repository references to `settings.jsonc` and `keymap.jsonc` so hosting and editing tools recognize their JSONC syntax. Consumer AI must still merge them into Zed's required `settings.json` and `keymap.json` target files; existing user configurations do not need to be renamed.
 - **repository / module authoring protocol**: Require official configuration references, preserve useful source comments, distinguish intent from syntax narration, and omit repeated upstream defaults unless a stability reason is documented. Existing modules have been reassessed against their tested application versions; future module authors receive a deterministic missing-guidance diagnostic and local semantic review handles source quality and default equivalence.
 - **repository / consumer protocol**: List every available Application Module in the human entry point so users and AI can select Fish, WezTerm, Neovim, Starship, or Zed without inspecting unrelated modules. Existing consumer configurations do not change.
 - **nvim / module guidance**: Remove empty user-extension placeholders and place update-checker and runtime-plugin preference explanations beside their settings. Existing runtime behavior does not change because the removed files contained no code.

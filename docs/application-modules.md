@@ -1,6 +1,6 @@
 # Authoring an Application Module
 
-Create the module directly under the repository root using the application's name. Arrange its Reference Configuration relative to the application's native configuration root, then state the real user target location in `README.md`. Do not add an `apps/` wrapper or a machine-readable manifest.
+Create the module directly under the repository root using the application's name. Arrange its Reference Configuration relative to the application's native configuration root, then state the real user target location in `README.md`. A repository reference may use a syntax-explicit suffix such as `.jsonc` when that improves rendering; if the application requires another filename, document the exact rename or merge target. Do not add an `apps/` wrapper or a machine-readable manifest.
 
 Write one coherent, sanitized Reference Configuration. When importing an existing configuration, preserve useful comments by default. Remove or rewrite a comment only when it exposes private information, is inaccurate for the supported version, merely narrates syntax, or describes a setting that no longer exists.
 

@@ -1,5 +1,6 @@
-// Zed parses this file as JSONC, so comments belong beside the choices they
-// explain. Official guide: https://zed.dev/docs/configuring-zed
+// Repository reference: merge this JSONC content into Zed's settings.json;
+// do not copy the .jsonc filename into the user configuration directory.
+// Official guide: https://zed.dev/docs/configuring-zed
 {
   // Maintainer Preference: CLI and OS file-open requests create a new window
   // instead of reusing the default existing window. File > Open is unaffected.

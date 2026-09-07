@@ -12,7 +12,7 @@ The Catppuccin icon/theme variants, Monaspace Neon Frozen font, Gemini agent ser
 
 ## Target configuration location
 
-The reference files map to `$XDG_CONFIG_HOME/zed/settings.json` and `$XDG_CONFIG_HOME/zed/keymap.json`, falling back to `~/.config/zed/` when `XDG_CONFIG_HOME` is unset. Merge selected settings into existing files and preserve unrelated language, task, extension, collaboration, and remote-development configuration.
+The repository uses `settings.jsonc` and `keymap.jsonc` so GitHub and other tools recognize the commented syntax. They are reference filenames, not Zed's native filenames. When adapting them, merge the selected content into `$XDG_CONFIG_HOME/zed/settings.json` and `$XDG_CONFIG_HOME/zed/keymap.json`, falling back to `~/.config/zed/` when `XDG_CONFIG_HOME` is unset. Do not place competing `.jsonc` files in the user's Zed configuration directory, and preserve unrelated language, task, extension, collaboration, and remote-development configuration.
 
 ## Capabilities and maintainer preferences
 
@@ -26,7 +26,7 @@ Existing CLI open behavior, Git panel presentation, themes, icon themes, font se
 
 ## Safe validation
 
-Zed officially parses these files as JSONC, including comments and trailing commas. From this knowledge-base clone, validate the tracked reference without opening Zed or loading provider state:
+Zed officially parses its `.json` configuration files as JSONC, including comments and trailing commas. The `.jsonc` suffix is used only for these repository references. From this knowledge-base clone, validate them without opening Zed or loading provider state:
 
 ```sh
 scripts/check all

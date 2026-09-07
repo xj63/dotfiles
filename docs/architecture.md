@@ -32,8 +32,8 @@ It is not a dotfile installer, a home-directory mirror, or a synchronization ser
 │   └── conf.d/
 ├── zed/
 │   ├── README.md
-│   ├── settings.json
-│   └── keymap.json
+│   ├── settings.jsonc
+│   └── keymap.jsonc
 └── wezterm/
     ├── README.md
     └── wezterm.lua
@@ -43,7 +43,7 @@ Application Modules live directly at the repository root. Repository infrastruct
 
 ## Application Module contract
 
-Each Application Module contains one coherent Reference Configuration and a human-readable `README.md`. Files are organized relative to the application's native configuration root rather than the user's home directory. The README states the actual target location.
+Each Application Module contains one coherent Reference Configuration and a human-readable `README.md`. Files are organized relative to the application's native configuration root rather than the user's home directory. A reference may use an explicit syntax suffix such as `.jsonc` for correct rendering even when the application requires `.json`; the README states the exact source-to-target mapping.
 
 Configuration comments are the primary location for explaining capabilities, applicable conditions, conflicts, and Maintainer Preferences. When the native format cannot safely carry comments, the module README carries that explanation. Mutually exclusive alternatives are explained in comments first and become separate files only when a single coherent reference cannot express them.
 

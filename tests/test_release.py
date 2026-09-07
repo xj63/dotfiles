@@ -37,20 +37,25 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(expected, result.stdout.strip())
 
     def test_prepared_release_has_fresh_unreleased_and_equivalent_notes(self) -> None:
-        result = subprocess.run(
-            [
-                str(RELEASE_CHECK),
-                "verify",
-                "1.0.0",
-                "--root",
-                str(ROOT),
-                "--notes",
-                "docs/releases/1.0.0.md",
-            ],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            subprocess.run(["git", "init", "--quiet", str(repository)], check=True)
+            self._write_release_fixture(repository)
+            subprocess.run(["git", "add", "."], cwd=repository, check=True)
+            result = subprocess.run(
+                [
+                    str(RELEASE_CHECK),
+                    "verify",
+                    "1.0.0",
+                    "--root",
+                    str(repository),
+                    "--notes",
+                    "docs/releases/1.0.0.md",
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
 
         self.assertEqual(0, result.returncode, result.stderr)
 

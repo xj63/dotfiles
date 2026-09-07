@@ -46,21 +46,21 @@ Fish loads `conf.d/*.fish` before `config.fish`; inspect those files when a valu
 
 ## Safe validation
 
-Run syntax validation before loading the changed configuration:
+Run syntax validation on every changed Fish file before loading the configuration:
 
 ```sh
-fish --no-config --no-execute "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish"
+find "${XDG_CONFIG_HOME:-$HOME/.config}/fish" -name '*.fish' -type f -exec fish --no-config --no-execute '{}' \;
 ```
 
-This parses the file without executing its commands. If it fails, stop, show the diagnostic, and use the established Recovery Path. Starting or restarting an interactive shell can affect the user's session and requires confirmation.
+This parses the files without executing their commands. If it fails, stop, show the diagnostic, and use the established Recovery Path. Starting or restarting an interactive shell can affect the user's session and requires confirmation.
 
 ## Consumer AI workflow
 
 1. Understand the desired Fish behavior and unresolved choices.
-2. Inspect the operating system, Fish version, resolved configuration directory, existing `config.fish`, relevant `conf.d` files, and whether Git and conflicting names exist.
-3. Read this module and the capability comments in `config.fish`.
+2. Inspect the operating system, Fish version, resolved configuration directory, existing `config.fish`, `conf.d` and `functions` files, relevant optional tools, and conflicting names.
+3. Read this module and the capability comments in `config.fish`, `conf.d`, and `functions`.
 4. Present a minimal plan covering exact edits, behavior, conflicts, optional dependencies, recovery, and validation. Do not edit yet.
-5. Obtain confirmation for each behavior change. If Fish or Git is missing, do not install it unless the user separately approves an official source or their chosen package manager.
+5. Obtain confirmation for each behavior change. If Fish or an optional tool is missing, do not install it unless the user separately approves an official source or their chosen package manager.
 6. Establish a Recovery Path, then merge only the accepted capabilities and preserve unrelated settings. Inspect version control before editing. If the affected files are tracked and clean, record the current commit and an exact command such as `git restore --source=<checkpoint> -- <affected-path>`; if they already have changes, ask the user to commit them or approve another checkpoint rather than discarding them. If the target is not version-controlled, back up only the affected files, tell the user each exact backup path, and provide the exact command that would restore it. If the target does not exist yet, record that prior absence and explain that recovery removes the newly created file. Never apply any restoration without confirmation.
 7. Run the safe syntax validation above. On failure, stop and offer restoration; do not continue to shell restart or further changes.
 8. On success, update the user's existing intent document with the current goal, reasons for non-obvious choices, and the upstream release or commit reviewed. If no convention exists, prefer useful comments in `config.fish`; when comments are unsuitable, propose a Markdown document such as `AI-INTENT.md` inside the Fish configuration directory and ask before creating it. Use ignored `.local/` state in this clone only when intent cannot live beside the Consumer Configuration and the user approves that fallback.

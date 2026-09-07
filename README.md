@@ -18,7 +18,7 @@ Present the smallest plan that satisfies my goal. Explain behavior changes, prer
 I want help with: [goal]
 ```
 
-The first complete module is [Fish](fish/README.md). More applications can be added independently without requiring users or AI tools to inspect unrelated modules.
+Available Application Modules are [Fish](fish/README.md), [WezTerm](wezterm/README.md), [Neovim](nvim/README.md), [Starship](starship/README.md), and [Zed](zed/README.md). Select only the module relevant to the current goal; users and AI tools do not need to inspect the others.
 
 ## Reviewing newer Fish guidance
 

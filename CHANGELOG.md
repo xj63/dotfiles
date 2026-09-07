@@ -13,6 +13,8 @@ All notable user-facing and repository-protocol changes are recorded here.
 
 ### Changed
 
+- **repository / consumer protocol**: List every available Application Module in the human entry point so users and AI can select Fish, WezTerm, Neovim, Starship, or Zed without inspecting unrelated modules. Existing consumer configurations do not change.
+- **Fish / validation guidance**: Extend safe validation and inspection guidance to cover `config.fish`, `conf.d`, functions, and all optional tools. Existing Fish behavior does not change.
 - **Fish / behavior and preferences**: Expand the reference into the maintainer's sanitized daily setup with vi bindings, theme colors, guarded toolchain integrations, and command helpers. Existing consumers should review each optional dependency and name conflict before adopting anything; the former quiet greeting changes to an explicit dynamic greeting only when selected.
 
 ## [1.0.0] - 2026-09-07

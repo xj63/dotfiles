@@ -2,6 +2,8 @@
 
 Date: 2026-09-07
 
+This is a historical acceptance record for the Fish reference at that date, not a description of the current module. Later changes removed the quiet greeting and `gst` abbreviation used by these fixtures; the scenarios remain evidence for sequencing, confirmation, recovery, validation, and intent preservation.
+
 This provider-free acceptance run used the repository's current local AI session and three isolated temporary Consumer Configurations. The AI read the root prompt, `AGENTS.md`, `REVIEW.md`, `fish/README.md`, and `fish/config.fish` before acting. Temporary files were outside the repository and contained no credentials or real user data.
 
 ## Missing dependency and declined action

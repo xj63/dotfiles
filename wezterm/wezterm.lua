@@ -24,9 +24,11 @@ config.color_scheme = "Catppuccin Mocha"
 -- https://wezterm.org/config/lua/config/enable_tab_bar.html
 config.enable_tab_bar = false
 
--- Maintainer Preference: prefer Monaspace over WezTerm's bundled default stack,
--- then fall back to Menlo. Font names depend on installed local resources.
--- Inspect resolution with `wezterm ls-fonts`.
+-- Maintainer Preference: prefer the exact Monaspace Neon Frozen family from
+-- GitHub Next's Monaspace Frozen Fonts package, then fall back to macOS Menlo.
+-- Other platforms should substitute an installed fallback. Neither font is
+-- installed by this file; inspect resolution with `wezterm ls-fonts`.
+-- https://github.com/githubnext/monaspace/releases
 -- https://wezterm.org/config/fonts.html
 config.font = wezterm.font_with_fallback({ "Monaspace Neon Frozen", "Menlo" })
 

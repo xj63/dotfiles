@@ -2,13 +2,22 @@
 
 ## Purpose and environment
 
-This module is the maintainer's macOS-oriented Zed editor setup. It was validated with Zed 1.18.1 on macOS 26.6.2. It combines Vim-style editing, safer application exit, efficient panel and search navigation, a tree-style Git panel, Catppuccin themes, Monaspace, visible code intelligence, Markdown wrapping, and a double-Shift file finder.
+This module is the maintainer's macOS-oriented Zed editor setup. It was last runtime-validated with Zed 1.18.1 on macOS 26.6.2, and its relevant upstream release changes were reviewed through Zed 1.19.2. Zed does not provide a non-interactive configuration validator, so a newer runtime claim is intentionally deferred until the Settings Editor/schema diagnostics are exercised. It combines Vim-style editing, safer application exit, efficient panel and search navigation, a tree-style Git panel, Catppuccin themes, Monaspace, visible code intelligence, Markdown wrapping, and a double-Shift file finder.
 
 ## Prerequisites and installation
 
 Zed is required; on macOS detect it with `command -v zed` or inspect `/Applications/Zed.app`, then run `zed --version`. Obtain it from the official download page at https://zed.dev/download only after the user approves. Read the official configuration guide at https://zed.dev/docs/configuring-zed and compare inherited values with the versioned defaults before adding an override.
 
-The Catppuccin icon/theme variants, Monaspace Neon Frozen font, and `cargo-tom` LSP configuration are optional external capabilities. Detect their availability in the user's Zed installation before selecting them. Never copy extension state into this module, and never install an extension without confirmation.
+The visual and language integrations are separate optional dependencies:
+
+| Setting or capability | Exact dependency | Detection and installation boundary |
+| --- | --- | --- |
+| `theme` values ending in `(Blur)` | [Catppuccin Blur](https://zed.dev/extensions/catppuccin-blur) extension | Open `zed: extensions`, use the Installed filter, and verify that the named Latte and Mocha variants appear in Zed's theme selector. Install only after confirmation. The similarly named Catppuccin and Catppuccin Blur+ extensions are not substitutes for these exact theme names. |
+| `icon_theme = "Catppuccin Mocha"` | [Catppuccin Icons](https://zed.dev/extensions/catppuccin-icons) extension | Verify it in the Installed filter and icon-theme selector; install only after confirmation. |
+| `buffer_font_family = "Monaspace Neon Frozen"` | The `Monaspace Neon Frozen` family from GitHub Next's [Monaspace Frozen Fonts release package](https://github.com/githubnext/monaspace/releases) | Verify the exact family in macOS Font Book or Zed's font selector. Installing a font changes system font availability and may require restarting Zed, so obtain confirmation first. Other Monaspace static, variable, or Nerd Font families have different names. |
+| `lsp.cargo-tom` initialization | [CargoTom](https://zed.dev/extensions/cargo-tom) extension, whose server key is `cargo-tom` | Verify the extension in the Installed filter. The setting is inert without it; install only when the user wants Cargo.toml suggestions and approves the extension. |
+
+Use Zed's official [extension installation workflow](https://zed.dev/docs/extensions/installing-extensions). Never copy extension state into this module, and never install an extension or font merely because the Reference Configuration names it.
 
 ## Target configuration location
 

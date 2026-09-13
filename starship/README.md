@@ -6,7 +6,15 @@ This module is the maintainer's compact two-sided Starship prompt. It was valida
 
 ## Prerequisites and installation
 
-Starship is required; detect it with `command -v starship` and inspect its version with `starship --version`. Use the official installation guide at https://starship.rs/guide/#step-1-install-starship only after the user approves. Read the official configuration and default-value reference at https://starship.rs/config/ before adapting a module. The prompt uses standard Unicode symbols and terminal colors but works best in a font that renders `❯`, `❮`, and `≡` clearly.
+Starship is required; detect it with `command -v starship` and inspect its version with `starship --version`. Use the official installation guide at https://starship.rs/guide/#step-1-install-starship only after the user approves. Read the official configuration and default-value reference at https://starship.rs/config/ before adapting a module.
+
+| Capability | Exact dependency | Detection and acquisition behavior |
+| --- | --- | --- |
+| Prompt rendering | Starship plus one shell-specific initialization hook | Inspect the user's shell startup files before following Starship's official initialization instructions. The repository's Fish module conditionally runs `starship init fish`; do not add a duplicate hook. |
+| Git branch, operation, and status modules | [Git](https://git-scm.com/downloads), detected with `command -v git` | Optional outside Git worktrees. Starship suppresses these modules when their context is unavailable; do not install Git solely for prompt decoration. |
+| Right prompt in Bash | [Ble.sh](https://github.com/akinomyoga/ble.sh) 0.4 or newer | Required only when this two-sided layout is used in Bash. Detect the user's existing Ble.sh initialization and version before proposing installation; Fish and Zsh do not need Ble.sh for their native right-prompt support. |
+| Python virtual-environment label | An active environment exposing `VIRTUAL_ENV` or an equivalent Starship-supported variable | Python itself is not needed for Starship to parse this file. The module appears only when an environment is active; preserve the user's chosen Python/environment manager. |
+| `❯`, `❮`, `≡`, and zero-width status markers | A terminal font that renders these standard Unicode glyphs correctly | No Nerd Font or named font package is required. Verify the actual terminal rendering; only propose a font change if glyphs are missing and the user chooses a family. |
 
 A supported shell must initialize Starship separately. The Fish module in this repository conditionally runs `starship init fish`; other shells should follow Starship's official shell-specific setup. Do not add a second initialization when the user's shell already loads Starship.
 

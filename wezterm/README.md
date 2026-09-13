@@ -6,7 +6,9 @@ This module is the maintainer's compact, cross-platform WezTerm appearance confi
 
 ## Prerequisites and installation
 
-WezTerm is required; detect it with `command -v wezterm` and inspect its version with `wezterm --version`. Install it from the official project at https://wezterm.org/installation.html only after the user approves. Read the official configuration-file reference at https://wezterm.org/config/files.html and its linked per-option pages before adapting a setting. `Monaspace Neon Frozen` is an optional font preference; the configuration falls back to `Menlo` when it is unavailable. Catppuccin Mocha is bundled with the tested WezTerm release.
+WezTerm is required; detect it with `command -v wezterm` and inspect its version with `wezterm --version`. Install it from the official project at https://wezterm.org/installation.html only after the user approves. Read the official configuration-file reference at https://wezterm.org/config/files.html and its linked per-option pages before adapting a setting.
+
+`config.font` prefers the exact `Monaspace Neon Frozen` family from GitHub Next's [Monaspace Frozen Fonts release package](https://github.com/githubnext/monaspace/releases). Check resolution with `wezterm ls-fonts` before selecting it. Installing the font changes system font availability and can require a WezTerm restart, so obtain confirmation first. `Menlo` is the explicit macOS fallback; users on other platforms should replace it with an installed local fallback rather than assume Menlo exists. `Catppuccin Mocha` is bundled with the tested WezTerm release and requires no separate theme plugin; the safe `show-keys --lua` validation below confirms that the installed version recognizes the scheme.
 
 ## Target configuration location
 

@@ -5,6 +5,7 @@ Release only from a clean branch created from current `main`. Read `[Unreleased]
 Prepare one pull request that leaves a fresh empty `[Unreleased]`, moves the complete batch under `## [X.Y.Z] - YYYY-MM-DD`, and adds `docs/releases/X.Y.Z.md` with an H1 followed by the exact release body. Run:
 
 ```sh
+python3 -m unittest discover -s tests -v
 scripts/check all
 scripts/release-check verify X.Y.Z --notes docs/releases/X.Y.Z.md
 ```

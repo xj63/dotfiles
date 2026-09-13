@@ -6,7 +6,7 @@ This module is a coherent Fish setup derived from the maintainer's daily configu
 
 ## Applicable environment
 
-The reference was validated with Fish 4.9.2 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew, Android Studio, and `open` conventions are macOS-specific and optional.
+The reference was validated with Fish 4.9.3 on macOS 26.6.2. Its core syntax uses Fish 4.x, while the Homebrew and Android Studio conventions are macOS-specific and optional.
 
 ## Prerequisites and installation
 
@@ -14,7 +14,26 @@ Fish is required. Detect it with `command -v fish` and inspect its version with 
 
 On macOS, `brew install fish` is an optional installation path when the user has chosen Homebrew. Explain a missing installation and ask for explicit approval before running that or any other installation command.
 
-Git, Neovim, Starship, FZF, Zoxide, Eza, Yazi, 7-Zip (`7zz`), uv, WezTerm, Android Studio, and its SDK are optional. The configuration detects startup integrations before loading them. Individual helper functions still report the missing command when invoked; never install an optional tool merely to satisfy this reference.
+Optional dependencies are capability-scoped; none is required merely to start Fish with `config.fish`. Startup blocks test for their command or installation directory before use. Most helper functions are autoloaded without executing their wrapped command, so a missing tool matters only when that helper is invoked.
+
+| Capability or setting | Exact dependency and availability check | Acquisition guidance |
+| --- | --- | --- |
+| Homebrew environment and hint control | [Homebrew](https://brew.sh), specifically the Apple Silicon path `/opt/homebrew/bin/brew` | Optional macOS preference. The block is skipped when that executable is absent; Intel or custom-prefix users should adapt the detected path rather than install a second Homebrew. |
+| `EDITOR` and `VISUAL` | [Neovim](https://neovim.io), detected with `command -v nvim` | Optional editor choice; installing Neovim does not authorize changing an existing editor preference. |
+| Nord interactive theme | Fish's bundled `Nord` theme, verified with `fish_config theme list` | No theme plugin or download is required. `fish_config theme choose Nord` uses the palette shipped by the installed Fish version. |
+| Rust environment | [rustup](https://rustup.rs), detected through `$HOME/.cargo/env.fish` | Optional Rust toolchain manager. The file is sourced only when an existing rustup installation owns it. |
+| Android SDK variables and tools | [Android Studio and Android SDK](https://developer.android.com/studio), detected at `$HOME/Library/Android/sdk` | Optional macOS Android workflow; project-selected SDK component versions remain outside this reference. |
+| `JAVA_HOME` and Java `PATH` | Android Studio's bundled JetBrains Runtime, detected at `/Applications/Android Studio.app/Contents/jbr/Contents/Home` | Optional macOS preference. Use a project JDK manager instead when it already owns Java selection. |
+| Interactive fuzzy-finder bindings | [fzf](https://github.com/junegunn/fzf), detected with `command -v fzf` | Optional; `fzf --fish` is evaluated only in an interactive shell when installed. |
+| Prompt rendering | [Starship](https://starship.rs), detected with `command -v starship` | Optional; select the repository's Starship module separately if its prompt preferences are desired. |
+| Directory jumping | [zoxide](https://github.com/ajeetdsouza/zoxide), detected with `command -v zoxide` | Optional; initialization is skipped when absent. |
+| Enhanced `ls` and `tree` | [Eza](https://eza.rocks), detected with `command -v eza` | Optional. `ls` falls back to the system command; `tree` returns an explicit missing-Eza diagnostic. |
+| `lf` helper | [Yazi](https://yazi-rs.github.io), invoked as `yazi` | Optional and needed only when `lf` is invoked; do not adopt the helper if the real `lf` file manager already owns that name. |
+| `7z` helper | [7-Zip](https://www.7-zip.org/download.html), invoked as `7zz` | Optional and needed only when `7z` is invoked. Confirm that the selected package exposes `7zz`. |
+| `uvr` helper | [uv](https://docs.astral.sh/uv/getting-started/installation/), invoked as `uv run python -m` | Optional and needed only when `uvr` is invoked; uv may resolve or create an environment. |
+| `hs`, `vs`, and `imgcat` helpers | [WezTerm](https://wezterm.org/installation.html), invoked through `wezterm cli` or `wezterm imgcat` | Optional and needed only when a helper is invoked; pane splitting additionally requires a live WezTerm mux context. |
+| `py` helper | [Python 3](https://www.python.org/downloads/), invoked as `python3` | Optional and needed only when `py` is invoked. |
+Detect only the dependencies for capabilities the user selects. Use each linked first-party project or a user-chosen package manager, and obtain confirmation before any installation.
 
 ## Target configuration location
 

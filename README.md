@@ -20,16 +20,18 @@ I want help with: [goal]
 
 Available Application Modules are [AeroSpace](aerospace/README.md), [Fish](fish/README.md), [Neovim](nvim/README.md), [Starship](starship/README.md), [WezTerm](wezterm/README.md), and [Zed](zed/README.md). Select only the module relevant to the current goal; users and AI tools do not need to inspect the others.
 
-## Reviewing newer Fish guidance
+## Reviewing newer application guidance
 
 Use this prompt after pulling a newer version of this repository:
 
 ```text
-Review Fish changes after the Review Cursor in my current intent record. Follow AGENTS.md and fish/README.md, generate the Fish-only update context, and compare it with my current configuration and goals. Give me an impact report before proposing edits. Ask before behavior, dependency, or preference changes; if I decline, leave my configuration and cursor unchanged. If I accept selected changes, establish recovery, apply only those changes, validate, update my current intent, and advance the cursor to the reviewed upstream state.
+Review [application] changes after the Review Cursor in my current intent record. Follow AGENTS.md and the selected module README, run `scripts/update-context <Review-Cursor> <application>`, and compare the application-scoped context with my current configuration and goals. Give me an impact report before proposing edits. Ask before behavior, dependency, or preference changes; if I decline, leave my configuration and cursor unchanged. If I accept selected changes, establish recovery, apply only those changes, validate, update my current intent, and advance the cursor to the reviewed upstream state.
 ```
 
 ## Repository maintenance
 
 Repository changes follow [AGENTS.md](AGENTS.md) and the shared [Review Policy](REVIEW.md). Known secret and privacy patterns are checked locally at commit time and again in GitHub Actions. Semantic Configuration Audits run in the maintainer's existing local AI session and are recorded in the pull request.
+
+Before proposing a pull request, run `python3 -m unittest discover -s tests -v` and `scripts/check all`. Together they validate the repository workflows and parse every Fish, TOML, Lua, JSON, and JSONC Reference Configuration with the applicable safe parser available in CI.
 
 Contributor AIs add independent root-level modules using the natural-language [Application Module authoring guide](docs/application-modules.md). No module manifest is required.

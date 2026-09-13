@@ -59,6 +59,7 @@ AI review produces a finding only when it can cite affected diff content and exp
 - an explicit value that only repeats the applicable official default without a documented stability reason;
 - configuration guidance that cites a secondary/unrelated source as though it were the application's official reference;
 - platform, application-version, prerequisite, target-location, conflict, or validation context missing when the change needs it;
+- a font, theme, icon pack, extension, plugin, language server, command, application, or platform service used by the reference without an exact dependency name, affected capability, availability check, acquisition behavior, and first-party source;
 - an absolute or environment-specific assumption that makes the Reference Configuration misleading;
 - a user-affecting configuration, dependency, or protocol change without Upstream Change Information;
 - a module explanation that is technically present but not useful to a human reader or consumer AI.

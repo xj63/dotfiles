@@ -10,6 +10,8 @@ AeroSpace 0.21.3-Beta or a compatible newer release is required. Detect the appl
 
 Use the official [installation instructions](https://nikitabobko.github.io/AeroSpace/guide#installation). The documented Homebrew route is `brew install --cask nikitabobko/tap/aerospace`, and the official GitHub releases provide a manual download. Explain a missing or older installation and obtain explicit approval before installing or upgrading it.
 
+The Reference Configuration uses only commands built into AeroSpace and the macOS Accessibility service. Verify permission under System Settings > Privacy & Security > Accessibility; Apple's [Accessibility permission guidance](https://support.apple.com/guide/mac-help/mchld5a35146/mac) is the platform source, and changing access requires confirmation. The reference has no font, theme, plugin, shell-command, or third-party application dependency. Application launchers and routing rules that would introduce such dependencies are deliberately excluded.
+
 Read the official [configuration guide](https://nikitabobko.github.io/AeroSpace/guide#configuring-aerospace), [default configuration](https://github.com/nikitabobko/AeroSpace/blob/v0.21.3-Beta/docs/config-examples/default-config.toml), and [command reference](https://nikitabobko.github.io/AeroSpace/commands) before adapting this reference.
 
 ## Target configuration location

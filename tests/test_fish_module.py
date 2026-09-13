@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import shutil
-import subprocess
 import unittest
 from pathlib import Path
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-FISH = shutil.which("fish")
 
 
 class FishModuleTests(unittest.TestCase):
@@ -49,17 +46,6 @@ class FishModuleTests(unittest.TestCase):
         self.assertIn("$XDG_CONFIG_HOME/fish/config.fish", readme)
         self.assertIn("https://fishshell.com/", readme)
         self.assertIn("AI-INTENT.md", readme)
-
-    @unittest.skipUnless(FISH, "Fish is required for executable module validation")
-    def test_reference_configuration_has_valid_fish_syntax(self) -> None:
-        result = subprocess.run(
-            [FISH, "--no-config", "--no-execute", REPOSITORY_ROOT / "fish" / "config.fish"],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-
-        self.assertEqual(0, result.returncode, result.stderr)
 
     def test_theme_uses_fish_native_selection_without_generated_assignments(self) -> None:
         theme = (REPOSITORY_ROOT / "fish" / "conf.d" / "theme.fish").read_text()

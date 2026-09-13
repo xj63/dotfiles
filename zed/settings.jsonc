@@ -20,9 +20,14 @@
     "tree_view": true,
   },
 
-  // Maintainer Preferences: extension-provided Catppuccin resources and a
-  // locally installed Monaspace font replace Zed's defaults. The default system
-  // mode still selects between these explicit light and dark choices.
+  // Maintainer Preferences: the Catppuccin Icons extension provides the icon
+  // name, the separate Catppuccin Blur extension provides both theme names, and
+  // GitHub Next's Monaspace Frozen Fonts package provides the exact font family.
+  // Verify each resource before selecting it; none is installed by this file.
+  // https://zed.dev/extensions/catppuccin-icons
+  // https://zed.dev/extensions/catppuccin-blur
+  // https://github.com/githubnext/monaspace/releases
+  // The default system mode still selects between the light and dark choices.
   "icon_theme": "Catppuccin Mocha",
   "theme": {
     "light": "Catppuccin Latte (Blur)",

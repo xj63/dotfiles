@@ -6,7 +6,7 @@ This repository is an AI-first Configuration Knowledge Base. It gives a user's A
 
 It is not a dotfile installer, a home-directory mirror, or a synchronization service. A Consumer Configuration remains independent from this repository.
 
-## Planned repository shape
+## Current repository shape
 
 ```text
 /
@@ -20,26 +20,44 @@ It is not a dotfile installer, a home-directory mirror, or a synchronization ser
 │   └── pre-commit
 ├── scripts/
 │   ├── check
-│   └── install-hooks
+│   ├── install-hooks
+│   ├── review-context
+│   ├── update-context
+│   ├── release-check
+│   └── publish-release
 ├── .github/workflows/
 │   └── checks.yml
 ├── docs/
+│   ├── acceptance/
 │   ├── adr/
-│   └── agents/
+│   ├── agents/
+│   ├── releases/
+│   └── research/
+├── tests/
+├── aerospace/
+│   ├── README.md
+│   └── aerospace.toml
 ├── fish/
 │   ├── README.md
 │   ├── config.fish
-│   └── conf.d/
-├── zed/
+│   ├── conf.d/
+│   └── functions/
+├── nvim/
 │   ├── README.md
-│   ├── settings.jsonc
-│   └── keymap.jsonc
-└── wezterm/
+│   └── ...
+├── starship/
+│   ├── README.md
+│   └── starship.toml
+├── wezterm/
+│   ├── README.md
+│   └── wezterm.lua
+└── zed/
     ├── README.md
-    └── wezterm.lua
+    ├── settings.jsonc
+    └── keymap.jsonc
 ```
 
-Application Modules live directly at the repository root. Repository infrastructure uses conventional root files, `docs/`, `scripts/`, and `.github/`; there is no `apps/` wrapper.
+Application Modules live directly at the repository root. Repository infrastructure uses conventional root files, `docs/`, `scripts/`, `tests/`, and `.github/`; there is no `apps/` wrapper. The tree shows the current module families without attempting to enumerate every module-owned file.
 
 ## Application Module contract
 
@@ -58,7 +76,7 @@ A module README uses only the sections that add information. Its available subje
 - known conflicts;
 - safe validation.
 
-The prose remains natural and human-readable. The repository does not require a machine-readable module manifest. English is normative; a Chinese entry point or translation may be supplied without becoming a second source of truth.
+The prose remains natural and human-readable. Every non-core font, theme, icon pack, extension, plugin, language server, command, application, or platform service is mapped to the capability that uses it, an availability check, its acquisition behavior, and a first-party source. The repository does not require a machine-readable module manifest. English is normative; a Chinese entry point or translation may be supplied without becoming a second source of truth.
 
 ## Consumer-AI entry points
 

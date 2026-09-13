@@ -22,18 +22,23 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: "3.13"
+      - name: Install Lua syntax checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lua5.4
+          command -v luac || command -v luac5.4
       - name: Install pinned Fish for module validation
         run: |
           curl --fail --silent --show-error --location \
-            https://github.com/fish-shell/fish-shell/releases/download/4.9.2/fish-4.9.2-linux-x86_64.tar.xz \
+            https://github.com/fish-shell/fish-shell/releases/download/4.9.3/fish-4.9.3-linux-x86_64.tar.xz \
             --output "$RUNNER_TEMP/fish.tar.xz"
           printf '%s  %s\n' \
-            '677f352e4ed8f8ba35295754b17ed2f08d228abaf9344a8b1b2715afa5c80814' \
+            '8f643d10ad1abb0ef7072764c01ceb5cf61b2d373fda400cf60f0bad69b7e095' \
             "$RUNNER_TEMP/fish.tar.xz" | sha256sum --check
           tar --extract --xz --file "$RUNNER_TEMP/fish.tar.xz" --directory "$RUNNER_TEMP"
           sudo install --mode 0755 "$RUNNER_TEMP/fish" /usr/local/bin/fish
-          test "$(fish --version)" = 'fish, version 4.9.2'
-      - name: Run acceptance tests
+          test "$(fish --version)" = 'fish, version 4.9.3'
+      - name: Run acceptance and reference syntax tests
         run: python3 -m unittest discover -s tests -v
       - name: Check repository content
         run: scripts/check all
